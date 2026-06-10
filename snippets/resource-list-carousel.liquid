@@ -1,0 +1,204 @@
+{%- doc -%}
+  Renders a brand-aligned carousel with corrected padding and arrow positioning.
+{%- enddoc -%}
+
+{% liquid
+  assign slideshow_ref = ref | default: 'resourceListCarousel'
+%}
+
+<resource-carousel 
+  class="resource-list__carousel-wrapper" 
+  data-ref="{{ slideshow_ref }}"
+  style="--slide-width-max: {{ slide_width_max | default: '300px' }};"
+>
+  {%- comment -%} 
+    NAVIGATION: Corrected positioning to float in the section padding.
+  {%- endcomment -%}
+  <div class="carousel-navigation-wrapper">
+    <button class="carousel-btn carousel-btn--prev" aria-label="Previous item" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <button class="carousel-btn carousel-btn--next" aria-label="Next item" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  {%- comment -%} Native Scrolling Track {%- endcomment -%}
+  <div class="resource-carousel-track" id="Carousel-{{ slideshow_ref }}">
+    {% for item in slides limit: slides.size %}
+      {% render 'slideshow-slide',
+        index: forloop.index0,
+        children: item,
+        class: 'resource-list__slide resource-carousel-slide'
+      %}
+    {% endfor %}
+  </div>
+</resource-carousel>
+
+<style>
+  resource-carousel {
+    display: block;
+    position: relative;
+    width: 100%;
+    /* ARCHITECT FIX: Adds the necessary breathing room for arrows */
+    padding: 0 30px; 
+    box-sizing: border-box;
+    overflow: visible !important;
+  }
+
+  .carousel-navigation-wrapper {
+    position: absolute;
+    /* Centers arrows vertically against the product images */
+    top: 38%; 
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none; 
+    z-index: 100;
+    /* Pulls arrows into the padding area */
+    padding: 0 10px; 
+    box-sizing: border-box;
+  }
+
+  .carousel-btn {
+    pointer-events: auto;
+    background: #ffffff !important;
+    color: #115b5d !important; 
+    border: 1.5px solid #115b5d !important; 
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .carousel-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: #115b5d !important;
+  }
+
+  .carousel-btn:hover {
+    background: #115b5d !important;
+    color: #ffffff !important;
+  }
+
+  .carousel-btn:hover svg {
+    stroke: #ffffff !important;
+  }
+
+  .carousel-btn[disabled] {
+    opacity: 0 !important;
+    visibility: hidden;
+  }
+
+  /* Track & Slide Logic */
+  .resource-carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+    gap: 16px;
+    padding: 10px 0;
+  }
+
+  .resource-carousel-track::-webkit-scrollbar {
+    display: none; 
+  }
+
+  .resource-carousel-slide {
+    scroll-snap-align: start;
+    flex: 0 0 calc((100% - 48px) / 4); 
+    max-width: var(--slide-width-max, 300px);
+  }
+
+  /* MOBILE FIX: Visibility and alignment for smaller screens */
+  @media screen and (max-width: 749px) {
+    resource-carousel {
+      padding: 0 15px; /* Tighter padding for mobile */
+    }
+
+    .carousel-navigation-wrapper {
+      display: flex !important;
+      top: 32%; /* Adjusted for mobile product card height */
+      padding: 0 5px;
+    }
+
+    .carousel-btn {
+      width: 38px !important;
+      height: 38px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .carousel-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .resource-carousel-slide {
+      flex: 0 0 85%; /* Ensures "peek" effect to drive swiping */
+    }
+  }
+</style>
+
+<script>
+  if (!customElements.get('resource-carousel')) {
+    customElements.define('resource-carousel', class extends HTMLElement {
+      connectedCallback() {
+        setTimeout(() => this.initCarousel(), 100);
+      }
+
+      initCarousel() {
+        this.track = this.querySelector('.resource-carousel-track');
+        this.btnPrev = this.querySelector('.carousel-btn--prev');
+        this.btnNext = this.querySelector('.carousel-btn--next');
+        
+        if (!this.track || !this.btnPrev || !this.btnNext) return;
+
+        this.btnPrev.addEventListener('click', () => this.scroll('prev'));
+        this.btnNext.addEventListener('click', () => this.scroll('next'));
+        
+        this.track.addEventListener('scroll', () => {
+          requestAnimationFrame(() => this.updateButtons());
+        }, { passive: true });
+        
+        this.updateButtons();
+      }
+
+      scroll(direction) {
+        const slide = this.querySelector('.resource-carousel-slide');
+        if (!slide) return;
+        
+        const gap = parseInt(window.getComputedStyle(this.track).gap) || 16;
+        const scrollAmount = (slide.offsetWidth + gap);
+        
+        this.track.scrollBy({
+          left: direction === 'next' ? scrollAmount : -scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+
+      updateButtons() {
+        const tolerance = 10;
+        const isAtStart = this.track.scrollLeft <= tolerance;
+        const isAtEnd = Math.ceil(this.track.scrollLeft + this.track.clientWidth) >= this.track.scrollWidth - tolerance;
+
+        this.btnPrev.disabled = isAtStart;
+        this.btnNext.disabled = isAtEnd;
+      }
+    });
+  }
+</script>

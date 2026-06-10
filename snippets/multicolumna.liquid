@@ -1,0 +1,183 @@
+<style>
+  .multicolumna-wrapper {
+    padding: 40px 0;
+  }
+
+  .multicolumna-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f5259;
+    margin: 0 0 3rem;
+    text-align: center;
+  }
+
+  .multicolumna-subheading {
+    font-size: 1.1rem;
+    color: #5f6167;
+    margin: 0 0 3rem;
+    max-width: 700px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* Base Grid Architecture */
+  .multicolumna-grid {
+    display: grid;
+  }
+
+  .multicolumna-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .multicolumna-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(46, 111, 117, 0.1);
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+  }
+
+  .multicolumna-icon img {
+    object-fit: contain;
+  }
+
+  .multicolumna-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2b2c30;
+    margin: 0;
+  }
+
+  .multicolumna-text {
+    font-size: 0.95rem;
+    color: #5f6167;
+    line-height: 1.6;
+  }
+
+  /* Desktop Architecture: 4 Columns */
+  @media (min-width: 768px) {
+    .multicolumna-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    .multicolumna-item {
+      padding: 2rem;
+    }
+    .multicolumna-icon {
+      width: 80px;
+      height: 80px;
+    }
+    .multicolumna-icon img {
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  /* Mobile Architecture: 2x2 Grid */
+  @media (max-width: 767px) {
+    .multicolumna-wrapper {
+      padding: 30px 0;
+    }
+    .multicolumna-heading {
+      font-size: 1.5rem;
+      padding: 0 15px;
+      margin-bottom: 1.5rem;
+    }
+    .multicolumna-subheading {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      padding: 0 15px;
+    }
+    .multicolumna-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem; /* Tight gap to fit mobile screens efficiently */
+    }
+    .multicolumna-item {
+      padding: 1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06); 
+    }
+    .multicolumna-icon {
+      width: 60px;
+      height: 60px;
+    }
+    .multicolumna-icon img {
+      width: 35px;
+      height: 35px;
+    }
+    .multicolumna-title {
+      font-size: 1rem;
+    }
+    .multicolumna-text {
+      font-size: 0.85rem;
+    }
+  }
+</style>
+
+<div class="page-width">
+  <div class="multicolumna-wrapper" id="multicolumna-{{ section.id | default: '1' }}">
+    {% if settings.heading != blank %}
+      <h2 class="multicolumna-heading">{{ settings.heading }}</h2>
+    {% endif %}
+
+    {% if settings.subheading != blank %}
+      <p class="multicolumna-subheading">{{ settings.subheading }}</p>
+    {% endif %}
+
+    <div class="multicolumna-grid">
+      <div class="multicolumna-item">
+        {% if settings.col1_icon != blank %}
+          <div class="multicolumna-icon">
+            <img src="{{ settings.col1_icon | image_url: width: 120 }}" alt="{{ settings.col1_title }}" loading="lazy">
+          </div>
+        {% endif %}
+        <h3 class="multicolumna-title">{{ settings.col1_title | default: "Envío Gratis" }}</h3>
+        <div class="multicolumna-text">
+          {{ settings.col1_text | default: "<p>En compras mayores a $500</p>" }}
+        </div>
+      </div>
+
+      <div class="multicolumna-item">
+        {% if settings.col2_icon != blank %}
+          <div class="multicolumna-icon">
+            <img src="{{ settings.col2_icon | image_url: width: 120 }}" alt="{{ settings.col2_title }}" loading="lazy">
+          </div>
+        {% endif %}
+        <h3 class="multicolumna-title">{{ settings.col2_title | default: "Pago Seguro" }}</h3>
+        <div class="multicolumna-text">
+          {{ settings.col2_text | default: "<p>Protegemos tu información</p>" }}
+        </div>
+      </div>
+
+      <div class="multicolumna-item">
+        {% if settings.col3_icon != blank %}
+          <div class="multicolumna-icon">
+            <img src="{{ settings.col3_icon | image_url: width: 120 }}" alt="{{ settings.col3_title }}" loading="lazy">
+          </div>
+        {% endif %}
+        <h3 class="multicolumna-title">{{ settings.col3_title | default: "Soporte 24/7" }}</h3>
+        <div class="multicolumna-text">
+          {{ settings.col3_text | default: "<p>Estamos para ayudarte</p>" }}
+        </div>
+      </div>
+
+      <div class="multicolumna-item">
+        {% if settings.col4_icon != blank %}
+          <div class="multicolumna-icon">
+            <img src="{{ settings.col4_icon | image_url: width: 120 }}" alt="{{ settings.col4_title }}" loading="lazy">
+          </div>
+        {% endif %}
+        <h3 class="multicolumna-title">{{ settings.col4_title | default: "Garantía" }}</h3>
+        <div class="multicolumna-text">
+          {{ settings.col4_text | default: "<p>Productos garantizados</p>" }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,375 @@
+{% comment %}
+  =========================================
+  = Sección de Contador Regresivo Flash Sale =
+  = Architect: Shopify E-Commerce Architect =
+  = Updates: Dynamic Padding, Typography alignment, Subheader & Description Size Control =
+  =========================================
+{% endcomment %}
+
+<style>
+  /* Base Section Styles & Dynamic Padding */
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background-color: {{ section.settings.bg_color }};
+    text-align: center;
+    font-family: var(--font-body-family), sans-serif;
+    overflow: hidden;
+  }
+
+  /* Header Text */
+  #shopify-section-{{ section.id }} .fs-header {
+    font-family: var(--font-heading-family), serif;
+    font-weight: bold;
+    font-size: {{ section.settings.header_size }}px;
+    color: {{ section.settings.text_color }};
+    margin: 0 0 10px 0;
+    line-height: 1.2;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Subheader Text con tamaño dinámico */
+  #shopify-section-{{ section.id }} .fs-subheader {
+    font-size: {{ section.settings.subheader_size }}px;
+    color: {{ section.settings.text_color }};
+    opacity: 0.8;
+    margin-bottom: 30px;
+    line-height: 1.4;
+  }
+
+  /* The Actual Timer */
+  #shopify-section-{{ section.id }} .fs-timer-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+
+  #shopify-section-{{ section.id }} .fs-timer-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+  }
+
+  #shopify-section-{{ section.id }} .fs-timer-number {
+    font-size: 48px;
+    font-weight: 900;
+    color: {{ section.settings.highlight_color }};
+    line-height: 1;
+    background-color: rgba(0,0,0,0.03);
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  #shopify-section-{{ section.id }} .fs-timer-label {
+    font-size: 12px;
+    color: {{ section.settings.text_color }};
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* The Description Text con tamaño dinámico */
+  #shopify-section-{{ section.id }} .fs-description {
+    font-size: {{ section.settings.description_size }}px; 
+    color: {{ section.settings.text_color }};
+    max-width: 650px; 
+    margin: 0 auto 30px auto; 
+    line-height: 1.6; 
+    font-weight: 400;
+    text-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .fs-description p {
+    margin: 0;
+  }
+
+  /* The Call to Action Button */
+  #shopify-section-{{ section.id }} .fs-cta-button {
+    display: inline-block;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    border: 2px solid {{ section.settings.btn_bg_color }};
+  }
+
+  #shopify-section-{{ section.id }} .fs-cta-button:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border-color: {{ section.settings.text_color }};
+    transform: translateY(-2px);
+  }
+
+  /* Responsive Adjustments */
+  @media screen and (max-width: 768px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top | divided_by: 2 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | divided_by: 2 }}px;
+    }
+    #shopify-section-{{ section.id }} .fs-header {
+      font-size: 32px;
+    }
+    #shopify-section-{{ section.id }} .fs-subheader {
+      font-size: calc({{ section.settings.subheader_size }}px * 0.85); 
+    }
+    #shopify-section-{{ section.id }} .fs-timer-number {
+      font-size: 36px;
+      min-width: 60px;
+    }
+    #shopify-section-{{ section.id }} .fs-timer-container {
+        gap: 10px;
+    }
+    /* Escala la descripción en móviles de forma segura */
+    #shopify-section-{{ section.id }} .fs-description {
+      font-size: calc({{ section.settings.description_size }}px * 0.9);
+      padding: 0 15px;
+    }
+  }
+</style>
+
+<div class="fs-countdown-section section-{{ section.id }}-padding" data-section-id="{{ section.id }}" data-section-type="flash-sale-countdown">
+  <div class="page-width">
+    
+    {% if section.settings.header_text != blank %}
+      <h2 class="fs-header">{{ section.settings.header_text }}</h2>
+    {% endif %}
+
+    {% if section.settings.subheader_text != blank %}
+      <p class="fs-subheader">{{ section.settings.subheader_text }}</p>
+    {% endif %}
+
+    <div class="fs-timer-container" id="timer-{{ section.id }}" data-deadline="{{ section.settings.countdown_date }}">
+      <div class="fs-timer-block">
+        <span class="fs-timer-number days" id="days-{{ section.id }}">00</span>
+        <span class="fs-timer-label">Días</span>
+      </div>
+      <div class="fs-timer-block">
+        <span class="fs-timer-number hours" id="hours-{{ section.id }}">00</span>
+        <span class="fs-timer-label">Horas</span>
+      </div>
+      <div class="fs-timer-block">
+        <span class="fs-timer-number minutes" id="minutes-{{ section.id }}">00</span>
+        <span class="fs-timer-label">Min</span>
+      </div>
+      <div class="fs-timer-block">
+        <span class="fs-timer-number seconds" id="seconds-{{ section.id }}">00</span>
+        <span class="fs-timer-label">Seg</span>
+      </div>
+    </div>
+
+    {% if section.settings.description_text != blank %}
+      <div class="fs-description rte">
+        {{ section.settings.description_text }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+      <a href="{{ section.settings.button_link }}" class="fs-cta-button">
+        {{ section.settings.button_label }}
+      </a>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    const timerElement = document.getElementById('timer-{{ section.id }}');
+    if (!timerElement) return;
+
+    const deadlineString = timerElement.getAttribute('data-deadline');
+    if (!deadlineString || deadlineString.trim() === '') {
+        timerElement.innerHTML = "<p>¡El sale pronto termina!</p>";
+        return;
+    }
+
+    const deadline = new Date(deadlineString).getTime();
+
+    const daysSpan = document.getElementById('days-{{ section.id }}');
+    const hoursSpan = document.getElementById('hours-{{ section.id }}');
+    const minutesSpan = document.getElementById('minutes-{{ section.id }}');
+    const secondsSpan = document.getElementById('seconds-{{ section.id }}');
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const distance = deadline - now;
+
+      if (distance < 0) {
+        clearInterval(timerInterval);
+        daysSpan.innerHTML = "00";
+        hoursSpan.innerHTML = "00";
+        minutesSpan.innerHTML = "00";
+        secondsSpan.innerHTML = "00";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      daysSpan.innerHTML = String(days).padStart(2, '0');
+      hoursSpan.innerHTML = String(hours).padStart(2, '0');
+      minutesSpan.innerHTML = String(minutes).padStart(2, '0');
+      secondsSpan.innerHTML = String(seconds).padStart(2, '0');
+    }
+
+    updateTimer(); 
+    const timerInterval = setInterval(updateTimer, 1000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Flash Sale Countdown",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Configuración del Contador"
+    },
+    {
+      "type": "text",
+      "id": "countdown_date",
+      "label": "Fecha y hora de finalización (ISO Format)",
+      "default": "2024-12-31T23:59:00",
+      "info": "Ejemplo: YYYY-MM-DDTHH:MM"
+    },
+    {
+      "type": "text",
+      "id": "header_text",
+      "label": "Título de la Sección",
+      "default": "FLASH SALE"
+    },
+    {
+      "type": "range",
+      "id": "header_size",
+      "min": 20,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño del título (PC)",
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "subheader_text",
+      "label": "Subtítulo",
+      "default": "¡El tiempo se agota!"
+    },
+    {
+      "type": "range",
+      "id": "subheader_size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del subtítulo (PC)",
+      "default": 18
+    },
+    {
+      "type": "richtext",
+      "id": "description_text",
+      "label": "Texto descriptivo",
+      "default": "<p>Muebles para oficina y hogar con hasta 60% de descuento + 3 meses sin intereses. Solo del 01 al 15 de mayo.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto descriptivo (PC)",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Call To Action (Botón)"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Etiqueta del botón",
+      "default": "COMPRAR YA"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (Padding)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Superior",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Inferior",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Configuración de Color"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto base",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Color de los números (Urgencia)",
+      "default": "#FFC107"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Color de fondo del botón",
+      "default": "#FFC107"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Color de texto del botón",
+      "default": "#121212"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Flash Sale Countdown"
+    }
+  ]
+}
+{% endschema %}

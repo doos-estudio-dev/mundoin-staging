@@ -1,0 +1,92 @@
+{% comment %}
+  PERFORMANCE BOOST - Aggressive third-party script deferral
+  Blocks all non-essential scripts until after FCP/LCP
+{% endcomment %}
+
+<script>
+(function() {
+  'use strict';
+
+  let scriptsToDefer = [];
+  let loadTriggered = false;
+
+  const DEFER_PATTERNS = [
+    'loox', 'wishlist', 'swym', 'clarity', 'triplepixel',
+    'facebook', 'instagram', 'tiktok', 'pinterest', 'snapchat',
+    'analytics', 'gtag', 'fbevents', 'pixel',
+    'yotpo', 'judge.me', 'stamped', 'reviews',
+    'zendesk', 'intercom', 'drift', 'livechat', 'tawk',
+    'hcaptcha', 'recaptcha', 'hotjar', 'mouseflow', 'klaviyo',
+    'starapps'
+  ];
+
+  function shouldDefer(src) {
+    if (!src) return false;
+    const srcLower = src.toLowerCase();
+    if (srcLower.includes('shopify.com/s/javascripts') ||
+        srcLower.includes('mundoin.mx') ||
+        srcLower.includes('cdn.shopify.com/s/trekkie')) {
+      return false;
+    }
+    return DEFER_PATTERNS.some(pattern => srcLower.includes(pattern));
+  }
+
+  const originalAppendChild = Element.prototype.appendChild;
+  Element.prototype.appendChild = function(child) {
+    if (child.tagName === 'SCRIPT' && child.src && shouldDefer(child.src)) {
+      if (!loadTriggered) {
+        scriptsToDefer.push({ parent: this, script: child });
+        return child;
+      }
+    }
+    return originalAppendChild.call(this, child);
+  };
+
+  const originalInsertBefore = Element.prototype.insertBefore;
+  Element.prototype.insertBefore = function(newNode, referenceNode) {
+    if (newNode.tagName === 'SCRIPT' && newNode.src && shouldDefer(newNode.src)) {
+      if (!loadTriggered) {
+        scriptsToDefer.push({ parent: this, script: newNode, reference: referenceNode });
+        return newNode;
+      }
+    }
+    return originalInsertBefore.call(this, newNode, referenceNode);
+  };
+
+  function loadDeferredScripts() {
+    loadTriggered = true;
+    scriptsToDefer.forEach((item, index) => {
+      setTimeout(() => {
+        try {
+          if (item.reference) {
+            originalInsertBefore.call(item.parent, item.script, item.reference);
+          } else {
+            originalAppendChild.call(item.parent, item.script);
+          }
+        } catch (e) {}
+      }, index * 150);
+    });
+  }
+
+  let timeout = setTimeout(() => {
+    if (!loadTriggered) loadDeferredScripts();
+  }, 15000);
+
+  window.addEventListener('load', () => {
+    clearTimeout(timeout);
+    setTimeout(() => {
+      if (!loadTriggered) loadDeferredScripts();
+    }, 10000);
+  });
+
+  function userInteraction() {
+    if (!loadTriggered) {
+      setTimeout(loadDeferredScripts, 1000);
+    }
+  }
+
+  ['scroll', 'click', 'touchstart', 'mousemove'].forEach(event => {
+    window.addEventListener(event, userInteraction, { once: true, passive: true });
+  });
+})();
+</script>

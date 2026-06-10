@@ -1,0 +1,42 @@
+{%- comment -%}
+  Configuración de filtros permitidos en el tema de desarrollo
+
+  IMPORTANTE: Este archivo solo afecta el tema donde está instalado.
+  No afecta el tema de producción ni los metacampos globales.
+
+  Para agregar/quitar filtros, edita la lista abajo:
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    Lista de filtros permitidos (separados por coma)
+
+    Filtros básicos con datos suficientes:
+    - armado (479 productos)
+    - cajones (407 productos)
+    - descansabrazos (230 productos)
+    - espacio2 (210 productos)
+    - brazo (162 productos)
+    - estilo (140 productos)
+    - cojines (130 productos)
+    - cabecera (129 productos)
+    - forma (119 productos)
+    - capacidad (113 productos)
+
+    Para AGREGAR más filtros: añádelos a la lista separados por coma
+    Para QUITAR filtros: elimínalos de la lista
+  endcomment
+
+  assign allowed_filters_string = 'armado,cajones,descansabrazos,espacio2,brazo,estilo,cojines,cabecera,forma,capacidad'
+
+  comment
+    Filtros nativos de Shopify (siempre permitidos):
+    - Precio
+    - Disponibilidad
+    - Vendor/Marca
+
+    Estos se manejan automáticamente y no necesitas agregarlos aquí.
+  endcomment
+-%}
+
+{{ allowed_filters_string }}

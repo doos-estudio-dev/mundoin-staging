@@ -1,0 +1,2407 @@
+{% comment %}
+  Header Custom con Megamenu - Totalmente configurable desde el personalizador de Shopify
+{% endcomment %}
+
+<style>
+  :root {
+    --teal-dark: {{ section.settings.color_teal_dark }};
+    --teal: {{ section.settings.color_teal }};
+    --teal-light: {{ section.settings.color_teal_light }};
+    --text-main: {{ section.settings.color_text_main }};
+    --text-muted: {{ section.settings.color_text_muted }};
+    --bg-body: {{ section.settings.color_bg_body }};
+  }
+
+  header.custom-header-megamenu {
+    position: relative;
+    z-index: 1000;
+    background: #fff;
+    border-bottom: 1px solid rgba(15, 82, 89, 0.12);
+    box-shadow: 0 6px 16px -12px rgba(15, 82, 89, 0.65);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  header.custom-header-megamenu.scrolled {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+
+  header.custom-header-megamenu.scrolled .top-bar {
+    display: none !important;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+
+  header.custom-header-megamenu.scrolled .top-bar.custom-content {
+    display: none !important;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+
+  header.custom-header-megamenu.scrolled .header-wrapper {
+    padding: 0.75rem 1.5rem 0.5rem !important;
+  }
+
+  header.custom-header-megamenu.scrolled .brand img {
+    width: min(220px, 100%) !important;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .top-bar {
+    background: var(--teal-dark);
+    color: #fff;
+    font-size: 0.9rem;
+    padding: 0.65rem 0;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .top-bar .content {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .top-bar.custom-content {
+    padding: 0;
+  }
+
+  .top-bar.custom-content .content {
+    padding: 0 !important;
+    max-width: 100%;
+  }
+
+  .top-bar a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .header-wrapper {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 0.75rem;
+    position: relative;
+  }
+
+  .header-main {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-areas: "brand search actions";
+    align-items: center;
+    column-gap: 1.5rem;
+  }
+
+  .menu-toggle {
+    grid-area: menu;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .menu-toggle span,
+  .menu-toggle span::before,
+  .menu-toggle span::after {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--teal);
+    border-radius: 2px;
+    content: "";
+  }
+
+  .menu-toggle span {
+    position: relative;
+  }
+
+  .menu-toggle span::before {
+    position: absolute;
+    top: -5px;
+  }
+
+  .menu-toggle span::after {
+    position: absolute;
+    top: 5px;
+  }
+
+  .search {
+    grid-area: search;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .search-field {
+    position: relative;
+    width: 100%;
+  }
+
+  .search-field input {
+    width: 100%;
+    padding: 0.7rem 2.7rem 0.7rem 1.2rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--teal);
+    outline: none;
+    font-size: 0.95rem;
+    color: var(--text-main);
+  }
+
+  .search-field input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.3;
+  }
+
+  .search-field svg {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    stroke: var(--teal);
+    cursor: pointer;
+  }
+
+  .search-field__label {
+    display: block;
+  }
+
+  .predictive-search {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid rgba(15, 82, 89, 0.18);
+    border-radius: 16px;
+    box-shadow: 0 24px 50px -28px rgba(15, 82, 89, 0.55);
+    padding: 1.2rem;
+    z-index: 1200;
+    max-height: 420px;
+    overflow-y: auto;
+    display: none;
+  }
+
+  .predictive-search[data-open="true"] {
+    display: block;
+  }
+
+  .predictive-search__inner {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .predictive-search__section[hidden],
+  .predictive-search__empty[hidden] {
+    display: none !important;
+  }
+
+  .predictive-search__heading {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 0.6rem;
+  }
+
+  .predictive-search__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .predictive-search__item {
+    display: flex;
+  }
+
+  .predictive-search__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: color 0.2s ease;
+  }
+
+  .predictive-search__link:hover,
+  .predictive-search__link:focus {
+    color: var(--teal-dark);
+  }
+
+  .predictive-search__thumb {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(46, 111, 117, 0.08);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  .predictive-search__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .predictive-search__thumb--placeholder {
+    background: rgba(46, 111, 117, 0.1);
+  }
+
+  .predictive-search__title {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .predictive-search__empty {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* Autocompletado de sugerencias */
+  .predictive-search__autocomplete {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+  }
+
+  .predictive-search__suggestions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .predictive-search__suggestion {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+  }
+
+  .predictive-search__suggestion:hover,
+  .predictive-search__suggestion.active {
+    background-color: #f5f5f5;
+  }
+
+  .predictive-search__suggestion svg {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  /* Botón Ver todos los resultados */
+  .predictive-search__view-all {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 12px;
+    margin-top: 8px;
+  }
+
+  .predictive-search__view-all-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 16px;
+    background-color: #145b5d;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .predictive-search__view-all-link:hover {
+    background-color: #0f4647;
+    transform: translateY(-1px);
+    color: #ffffff;
+  }
+
+  .predictive-search__view-all-link:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 960px) {
+    .predictive-search {
+      position: fixed;
+      left: 50%;
+      top: 190px;
+      transform: translateX(-50%);
+      width: min(94vw, 520px);
+      max-height: calc(100vh - 140px);
+      padding: 1rem;
+    }
+  }
+
+  .brand {
+    grid-area: brand;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .brand img {
+    width: min(258px, 100%);
+    height: auto;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .actions {
+    grid-area: actions;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .actions a {
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .actions-icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .actions-icons svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--teal);
+    stroke-width: 1.7;
+    fill: none;
+  }
+
+  nav.custom-nav-megamenu {
+    max-width: 1440px;
+    margin: 0.35rem auto 1.5rem;
+    padding: 0 1.5rem 0.5rem;
+  }
+
+  .nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.75rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+
+  .nav-menu > li {
+    position: relative;
+  }
+
+  .navmenu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .navmenu-link:hover {
+    color: var(--teal-dark);
+  }
+
+  summary.navmenu-link {
+    list-style: none;
+  }
+
+  summary.navmenu-link::-webkit-details-marker {
+    display: none;
+  }
+
+  details[data-navmenu-details] {
+    position: relative;
+  }
+
+  .navmenu-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navmenu-icon svg {
+    width: 8px;
+    height: 6px;
+    stroke: currentColor;
+  }
+
+  .nav-menu-link--sale {
+    background: var(--teal-light);
+    color: #fff;
+    padding: 0.55rem 1.3rem;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .nav-menu-link--sale .navmenu-icon svg {
+    stroke: #fff;
+  }
+
+  .navmenu-link-depth-2,
+  .navmenu-link-depth-3 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main);
+    white-space: nowrap;
+  }
+
+  .navmenu-submenu {
+    list-style: none;
+    margin: 0;
+    padding: 0.85rem 1.1rem;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 18px 38px -24px rgba(15, 82, 89, 0.65);
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 220px;
+    z-index: 1000;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+
+  .navmenu-submenu > li + li {
+    margin-top: 0.65rem;
+  }
+
+  .navmenu-depth-2 > li {
+    position: relative;
+  }
+
+  .navmenu-depth-2 > li > details > summary {
+    padding-right: 1rem;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  .navmenu-depth-2 > li > details > summary .navmenu-icon svg {
+    transform: rotate(-90deg);
+  }
+
+  .navmenu-depth-2 .navmenu-submenu {
+    top: 0;
+    left: calc(100% + 0.6rem);
+    transform: none;
+    z-index: 1001;
+  }
+
+  /* Asegurar que el tercer nivel también sea visible */
+  .navmenu-depth-3.navmenu-submenu {
+    top: 0;
+    left: calc(100% + 0.6rem);
+    transform: none;
+    z-index: 1002;
+    background: #fff;
+    box-shadow: 0 18px 38px -24px rgba(15, 82, 89, 0.65);
+  }
+
+  details[open] > .navmenu-submenu {
+    display: block !important;
+  }
+
+  /* Ajustes especiales de posicionamiento para menús específicos */
+  .navmenu-id-promociones .navmenu-submenu {
+    left: 75% !important;
+  }
+
+  .navmenu-id-clientes .navmenu-submenu {
+    left: -50% !important;
+  }
+
+  @media (min-width: 961px) {
+    .navmenu-submenu {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    details[open] > .navmenu-submenu {
+      opacity: 1;
+      visibility: visible;
+      display: block !important;
+    }
+  }
+
+  @media (max-width: 960px) {
+    header.custom-header-megamenu nav {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .header-wrapper {
+      padding: 1.25rem 0 0.75rem;
+      transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    header.custom-header-megamenu.scrolled .header-wrapper {
+      padding: 0.75rem 0 0.5rem !important;
+    }
+
+    header.custom-header-megamenu.scrolled .brand img {
+      width: min(100px, 100%) !important;
+    }
+
+    /* Hide search when scrolling down on mobile */
+    .search {
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  margin 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    header.custom-header-megamenu.hide-search .search {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+    }
+
+    header.custom-header-megamenu.hide-search .header-main {
+      row-gap: 0;
+    }
+
+    .header-main {
+      transition: row-gap 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand {
+      grid-area: brand;
+      text-align: center;
+    }
+
+    .brand img {
+      width: min(115px, 100%);
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .header-main {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas:
+        "menu brand actions"
+        "search search search";
+      padding: 0 1.25rem;
+      column-gap: 0.75rem;
+      row-gap: 1rem;
+      align-items: center;
+      justify-items: center;
+    }
+
+    .menu-toggle {
+      display: flex;
+      justify-self: start;
+      grid-area: menu;
+    }
+
+    .actions {
+      justify-self: end;
+      grid-area: actions;
+    }
+
+    .search {
+      grid-area: search;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .search-field {
+      max-width: none;
+      width: 90%;
+      margin-inline: auto;
+    }
+
+    .search-field input {
+      padding: 0.8rem 2.75rem 0.8rem 1.1rem;
+    }
+
+    .actions {
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Ocultar solo el enlace de texto "Sucursales", no los iconos */
+    .actions > a {
+      display: none;
+    }
+
+    .actions-icons {
+      display: flex !important;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .actions-icons a {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .actions-icons .icon-user {
+      display: none !important;
+    }
+
+    .actions-icons svg {
+      width: 26px;
+      height: 26px;
+      display: block !important;
+    }
+  }
+
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(90vw, 340px);
+    background: var(--bg-body);
+    z-index: 2000;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-sidebar[data-open="true"] {
+    transform: translateX(0);
+  }
+
+  .mobile-sidebar__header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(15, 82, 89, 0.1);
+  }
+
+  .mobile-sidebar__close {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--teal);
+  }
+
+  .mobile-sidebar__body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 0;
+  }
+
+  .mobile-sidebar__body nav {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mobile-sidebar__body .nav-menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0 1.25rem;
+  }
+
+  .mobile-sidebar__body .navmenu-link {
+    padding: 0.8rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .mobile-sidebar__body .nav-menu-link--sale {
+    border-radius: 0;
+    background: none;
+    color: var(--teal-dark);
+    font-weight: 600;
+    padding: 0.8rem 0;
+  }
+
+  .mobile-sidebar__body .nav-menu-link--sale .navmenu-icon svg {
+    stroke: var(--teal-dark);
+  }
+
+  .mobile-sidebar__body .navmenu-submenu {
+    position: static;
+    display: block;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    padding: 0.5rem 0 0.5rem 1.25rem;
+    min-width: auto;
+    margin-top: -0.5rem;
+  }
+
+  .mobile-sidebar__body .navmenu-submenu {
+    display: none;
+  }
+
+  details[open] > .navmenu-submenu {
+    display: block;
+  }
+
+  .mobile-sidebar__body .navmenu-depth-2 .navmenu-submenu {
+    left: 0;
+    padding-left: 2.25rem;
+  }
+
+  .mobile-sidebar__body .navmenu-depth-2 > li > details > summary .navmenu-icon svg {
+    transform: rotate(0deg);
+  }
+
+  .mobile-sidebar__body .navmenu-depth-2 > li > details[open] > summary .navmenu-icon svg {
+    transform: rotate(180deg);
+  }
+
+  .mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 82, 89, 0.4);
+    z-index: 1999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .mobile-sidebar-overlay[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<header class="custom-header-megamenu">
+  {% if section.settings.show_top_bar %}
+  <div class="top-bar">
+    <div class="content">
+      <span>{{ section.settings.top_bar_text }}
+        {% if section.settings.top_bar_phone != blank %}
+          <a href="tel:{{ section.settings.top_bar_phone }}">{{ section.settings.top_bar_phone }}</a>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+  {% else %}
+    {% if section.settings.custom_top_bar_code != blank %}
+    <div class="top-bar custom-content">
+      <div class="content">
+        {{ section.settings.custom_top_bar_code }}
+      </div>
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <div class="header-wrapper">
+    <div class="header-main">
+      <button class="menu-toggle" type="button" aria-label="Abrir menú">
+        <span></span>
+      </button>
+
+      <div class="brand">
+        <a href="/">
+          {% if section.settings.logo != blank %}
+            <img src="{{ section.settings.logo | image_url: width: 516 }}"
+                 alt="{{ shop.name }}"
+                 width="{{ section.settings.logo_width }}"
+                 loading="lazy">
+          {% else %}
+            <img src="https://mundoin.mx/cdn/shop/files/Frame_2_258x48.png?v=1754349509" alt="{{ shop.name }}">
+          {% endif %}
+        </a>
+      </div>
+
+      <div class="actions">
+      {% if section.settings.show_sucursales_link %}
+        <a href="{{ section.settings.sucursales_link }}">{{ section.settings.sucursales_text }}</a>
+      {% endif %}
+
+      <div class="actions-icons">
+        {% if section.settings.show_account_icon %}
+        <a href="/account/login">
+          <svg class="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="7.5" r="3.5" />
+            <path d="M5 20c0-3.2 3.1-5.8 7-5.8s7 2.6 7 5.8" />
+          </svg>
+        </a>
+        {% endif %}
+
+        {% if section.settings.show_cart_icon %}
+          {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+            {% render 'cart-drawer' %}
+          {% else %}
+            <a href="/cart">
+              <svg class="icon-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6.5 6h15l-1.4 8.2c-0.2 1.1-1.1 1.8-2.2 1.8H9.6c-1.1 0-2-0.8-2.2-1.8L6 4H3" stroke-linecap="round" />
+                <circle cx="10" cy="20" r="1.3" fill="currentColor" stroke="none" />
+                <circle cx="18" cy="20" r="1.3" fill="currentColor" stroke="none" />
+              </svg>
+            </a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% if section.settings.show_search %}
+    <div class="search">
+      <div class="search-field" data-search-field>
+        <label class="search-field__label" for="site-search-{{ section.id }}">
+          <span class="sr-only">Buscar</span>
+          <input id="site-search-{{ section.id }}"
+                 type="search"
+                 placeholder="{{ section.settings.search_placeholder }}"
+                 autocomplete="on">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </label>
+
+        <div class="predictive-search"
+             id="predictive-search-results-{{ section.id }}"
+             data-predictive-search
+             hidden
+             role="dialog"
+             aria-label="Resultados de búsqueda"
+             aria-modal="false">
+          <div class="predictive-search__inner">
+            <!-- Sugerencias de autocompletado -->
+            <div class="predictive-search__autocomplete" data-autocomplete-suggestions hidden>
+              <h3 class="predictive-search__heading" style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Sugerencias</h3>
+              <ul class="predictive-search__suggestions" data-suggestions-list></ul>
+            </div>
+
+            <div class="predictive-search__section" data-predictive-section="products" hidden>
+              <h3 class="predictive-search__heading">{{ section.settings.search_products_title }}</h3>
+              <ul class="predictive-search__list" data-predictive-list="products"></ul>
+            </div>
+
+            <div class="predictive-search__section" data-predictive-section="pages" hidden>
+              <h3 class="predictive-search__heading">{{ section.settings.search_pages_title }}</h3>
+              <ul class="predictive-search__list" data-predictive-list="pages"></ul>
+            </div>
+
+            <div class="predictive-search__section" data-predictive-section="articles" hidden>
+              <h3 class="predictive-search__heading">{{ section.settings.search_articles_title }}</h3>
+              <ul class="predictive-search__list" data-predictive-list="articles"></ul>
+            </div>
+
+            <div class="predictive-search__view-all" data-view-all-results hidden>
+              <a href="/search" class="predictive-search__view-all-link" data-view-all-link>
+                Ver todos los resultados
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width: 16px; height: 16px; margin-left: 6px;">
+                  <path d="M7 3l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+
+            <div class="predictive-search__empty" data-predictive-empty hidden>
+              <p>{{ section.settings.search_no_results_text }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  </div>
+
+  {% if section.settings.menu != blank %}
+  <nav class="custom-nav-megamenu" aria-label="{{ linklists[section.settings.menu].title }}">
+    <ul class="nav-menu navmenu navmenu-depth-1" data-navmenu="" aria-label="{{ linklists[section.settings.menu].title }}">
+      {% for link in linklists[section.settings.menu].links %}
+        {% assign menu_class = link.title | handleize | prepend: 'navmenu-id-' %}
+        <li class="navmenu-item navmenu-basic__item {% if link.links.size > 0 %}navmenu-item-parent{% endif %} {{ menu_class }}" data-navmenu-parent="">
+          {% if link.links.size > 0 %}
+            <details data-navmenu-details="">
+              <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent {% if link.title contains 'Promocion' or link.title contains 'Sale' or link.title contains 'promocion' %}nav-menu-link--sale{% endif %}"
+                       aria-haspopup="true"
+                       aria-expanded="false"
+                       data-href="{{ link.url }}">
+                {{ link.title }}
+                <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                  <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down">
+                    <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                    <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                  </svg>
+                </span>
+              </summary>
+
+              <ul class="navmenu navmenu-depth-2 navmenu-submenu" data-navmenu="" data-navmenu-submenu="">
+                {% for child_link in link.links %}
+                  <li class="navmenu-item {% if child_link.links.size > 0 %}navmenu-item-parent{% endif %}">
+                    {% if child_link.links.size > 0 %}
+                      <details data-navmenu-details="">
+                        <summary data-href="{{ child_link.url }}"
+                                 class="navmenu-link navmenu-link-depth-2 navmenu-link-parent"
+                                 aria-haspopup="true"
+                                 aria-expanded="false">
+                          {{ child_link.title }}
+                          <span class="navmenu-icon navmenu-icon-depth-2" data-navmenu-trigger="">
+                            <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down">
+                              <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                              <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                            </svg>
+                          </span>
+                        </summary>
+
+                        <ul class="navmenu navmenu-depth-3 navmenu-submenu" data-navmenu="" data-navmenu-submenu="">
+                          {% for grandchild_link in child_link.links %}
+                            <li class="navmenu-item">
+                              <a class="navmenu-link navmenu-link-depth-3" href="{{ grandchild_link.url }}">
+                                {{ grandchild_link.title }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </details>
+                    {% else %}
+                      <a class="navmenu-link navmenu-link-depth-2" href="{{ child_link.url }}">
+                        {{ child_link.title }}
+                      </a>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </details>
+          {% else %}
+            <a class="navmenu-link navmenu-link-depth-1" href="{{ link.url }}">
+              {{ link.title }}
+            </a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+  {% endif %}
+</header>
+
+{% comment %} Mobile Sidebar {% endcomment %}
+<div class="mobile-sidebar" id="mobile-sidebar-{{ section.id }}" aria-hidden="true">
+  <div class="mobile-sidebar__header">
+    <button class="mobile-sidebar__close" type="button" aria-label="Cerrar menú">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="mobile-sidebar__body">
+    {% if section.settings.menu != blank %}
+    <nav aria-label="{{ linklists[section.settings.menu].title }}">
+      <ul class="nav-menu navmenu navmenu-depth-1" data-navmenu="">
+        {% for link in linklists[section.settings.menu].links %}
+          <li class="navmenu-item {% if link.links.size > 0 %}navmenu-item-parent{% endif %}">
+            {% if link.links.size > 0 %}
+              <details data-navmenu-details="">
+                <summary class="navmenu-link navmenu-link-depth-1 {% if link.title contains 'Promocion' or link.title contains 'Sale' or link.title contains 'promocion' %}nav-menu-link--sale{% endif %}"
+                         aria-haspopup="true"
+                         aria-expanded="false"
+                         data-href="{{ link.url }}">
+                  {{ link.title }}
+                  <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                    <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down">
+                      <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                      <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                    </svg>
+                  </span>
+                </summary>
+
+                <ul class="navmenu navmenu-depth-2 navmenu-submenu" data-navmenu="" data-navmenu-submenu="">
+                  {% for child_link in link.links %}
+                    <li class="navmenu-item {% if child_link.links.size > 0 %}navmenu-item-parent{% endif %}">
+                      {% if child_link.links.size > 0 %}
+                        <details data-navmenu-details="">
+                          <summary data-href="{{ child_link.url }}"
+                                   class="navmenu-link navmenu-link-depth-2 navmenu-link-parent"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">
+                            {{ child_link.title }}
+                            <span class="navmenu-icon navmenu-icon-depth-2" data-navmenu-trigger="">
+                              <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down">
+                                <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                                <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                              </svg>
+                            </span>
+                          </summary>
+
+                          <ul class="navmenu navmenu-depth-3 navmenu-submenu" data-navmenu="" data-navmenu-submenu="">
+                            {% for grandchild_link in child_link.links %}
+                              <li class="navmenu-item">
+                                <a class="navmenu-link navmenu-link-depth-3" href="{{ grandchild_link.url }}">
+                                  {{ grandchild_link.title }}
+                                </a>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </details>
+                      {% else %}
+                        <a class="navmenu-link navmenu-link-depth-2" href="{{ child_link.url }}">
+                          {{ child_link.title }}
+                        </a>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+            {% else %}
+              <a class="navmenu-link navmenu-link-depth-1" href="{{ link.url }}">
+                {{ link.title }}
+              </a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<div class="mobile-sidebar-overlay" id="mobile-sidebar-overlay-{{ section.id }}" aria-hidden="true"></div>
+
+<script>
+  (function() {
+    const sectionId = '{{ section.id }}';
+    const MIN_QUERY_LENGTH = 3;
+    const wrapper = document.querySelector('[data-search-field]');
+    if (!wrapper) return;
+
+    const searchField = wrapper.querySelector('input[type="search"]');
+    const container = wrapper.querySelector('[data-predictive-search]');
+    if (!searchField || !container) return;
+
+    // ===== SINÓNIMOS CONTEXTUALES MUNDO IN =====
+    // Basado en análisis real de 13,192 productos en inventario
+    const contextualSynonyms = {
+      // HABITACIÓN / RECÁMARA / DORMITORIO (tags: paquete_recamara, recamara)
+      'habitacion': ['cama', 'buro', 'ropero', 'cajonera', 'mesa de noche', 'closet'],
+      'recamara': ['cama', 'buro', 'ropero', 'cajonera', 'mesa de noche', 'closet'],
+      'dormitorio': ['cama', 'buro', 'ropero', 'cajonera', 'mesa de noche', 'closet'],
+      'bedroom': ['cama', 'buro', 'ropero', 'cajonera'],
+      'cuarto': ['cama', 'buro', 'ropero', 'cajonera'],
+
+      // COMEDOR (103 productos con tag "comedor", 45 con "paquete_comedor")
+      'comedor': ['mesa comedor', 'silla comedor', 'banco comedor', 'set comedor', 'paquete comedor'],
+      'dining': ['mesa comedor', 'silla comedor', 'banco comedor'],
+      'comedores': ['mesa comedor', 'silla comedor', 'set comedor'],
+
+      // COCINA
+      'cocina': ['mesa cocina', 'silla cocina', 'banco', 'banqueta'],
+      'kitchen': ['mesa', 'silla', 'banco'],
+
+      // SALA / LIVING (16 productos tipo "salas")
+      'sala': ['sillon', 'sofa', 'mesa centro', 'librero', 'mueble tv'],
+      'living': ['sillon', 'sofa', 'mesa centro', 'librero'],
+      'salas': ['sillon', 'sofa', 'mesa centro'],
+
+      // OFICINA (94 productos con tag "oficina", 62 sillas oficina, 47 escritorios, 61 paquete_homeoffice)
+      'oficina': ['escritorio', 'silla oficina', 'silla ejecutiva', 'archivero', 'cajonera'],
+      'office': ['escritorio', 'silla oficina', 'archivero'],
+      'trabajo': ['escritorio', 'silla oficina', 'archivero'],
+      'home office': ['escritorio', 'silla oficina', 'archivero'],
+      'homeoffice': ['escritorio', 'silla oficina', 'archivero'],
+
+      // EXTERIORES (tag "silla de exterior")
+      'exterior': ['silla exterior', 'mesa exterior', 'banco exterior'],
+      'jardin': ['silla exterior', 'mesa exterior', 'banco'],
+      'terraza': ['silla exterior', 'mesa exterior', 'banco'],
+      'patio': ['silla exterior', 'mesa exterior', 'banco'],
+
+      // ALMACENAJE (39 productos con tag "almacenaje")
+      'almacenaje': ['archivero', 'cajonera', 'librero', 'organizador'],
+      'organizacion': ['archivero', 'cajonera', 'librero', 'organizador'],
+      'guardar': ['archivero', 'cajonera', 'librero', 'organizador'],
+      'storage': ['archivero', 'cajonera', 'librero'],
+
+      // ESPACIOS GENERALES
+      'hogar': ['mesa', 'silla', 'cama', 'sillon'],
+      'casa': ['mesa', 'silla', 'cama', 'sillon'],
+      'muebles': ['mesa', 'silla', 'escritorio', 'cama']
+    };
+
+    // Sinónimos directos basados en productos reales
+    const directSynonyms = {
+      // SILLAS (67 sillas hogar + 62 sillas oficina = 129 productos)
+      'silla': ['chair', 'sillas'],
+      'sillas': ['silla', 'chair'],
+      'chair': ['silla', 'sillas'],
+      'silla comedor': ['silla hogar', 'dining chair'],
+      'silla oficina': ['silla ejecutiva', 'office chair', 'silla directiva'],
+      'ejecutiva': ['silla oficina', 'silla ejecutiva', 'directiva'],
+      'directiva': ['silla oficina', 'silla ejecutiva', 'ejecutiva'],
+
+      // MESAS (44 productos tipo "mesas" + 9 "mesa comedor")
+      'mesa': ['table', 'mesas'],
+      'mesas': ['mesa', 'table'],
+      'table': ['mesa', 'mesas'],
+      'mesa comedor': ['dining table', 'mesa hogar'],
+      'mesa centro': ['coffee table', 'mesa sala'],
+      'mesa trabajo': ['escritorio', 'desk'],
+
+      // ESCRITORIOS (47 productos)
+      'escritorio': ['desk', 'escritorios', 'mesa trabajo'],
+      'escritorios': ['escritorio', 'desk'],
+      'desk': ['escritorio', 'escritorios'],
+      'escritorio gamer': ['gaming desk', 'escritorio gaming'],
+
+      // SOFÁS/SILLONES (16 salas, 5 sillón)
+      'sofa': ['sillon', 'sofas'],
+      'sofas': ['sofa', 'sillon'],
+      'sillon': ['sofa', 'sillones'],
+      'sillones': ['sillon', 'sofa'],
+
+      // CAMAS
+      'cama': ['bed', 'camas'],
+      'camas': ['cama', 'bed'],
+      'bed': ['cama', 'camas'],
+
+      // BANCOS (25 bancos + 47 sets sillas y bancos)
+      'banco': ['stool', 'banqueta', 'bancos'],
+      'bancos': ['banco', 'stool'],
+      'stool': ['banco', 'banqueta'],
+      'banqueta': ['banco', 'stool'],
+
+      // ALMACENAJE (23 hogar + 22 oficina)
+      'archivero': ['filing cabinet', 'archivo', 'archiveros'],
+      'archiveros': ['archivero', 'archivo'],
+      'cajonera': ['drawer', 'cajoneras', 'comoda'],
+      'librero': ['bookcase', 'estante', 'libreros'],
+      'libreros': ['librero', 'estante'],
+      'estante': ['shelf', 'librero', 'estantes'],
+      'organizador': ['organizer', 'organizadores'],
+
+      // ROPEROS
+      'ropero': ['closet', 'armario', 'roperos'],
+      'closet': ['ropero', 'armario'],
+      'armario': ['closet', 'ropero'],
+
+      // BURÓS
+      'buro': ['nightstand', 'mesa noche', 'buros'],
+      'buros': ['buro', 'nightstand'],
+
+      // MUEBLES TV
+      'mueble tv': ['tv stand', 'rack tv', 'centro entretenimiento'],
+      'rack': ['mueble tv', 'estante'],
+
+      // SETS/PAQUETES (tags comunes: set comedor, paquete_comedor, paquete_homeoffice)
+      'set': ['paquete', 'juego', 'combo'],
+      'paquete': ['set', 'combo', 'juego'],
+      'juego': ['set', 'paquete'],
+      'combo': ['set', 'paquete']
+    };
+
+    // Términos populares para autocompletado (basado en productos reales)
+    const popularSearchTerms = [
+      // Habitaciones
+      'habitacion', 'recamara', 'dormitorio',
+      // Espacios
+      'comedor', 'sala', 'oficina', 'cocina', 'exterior', 'jardin',
+      // Muebles principales
+      'silla', 'silla oficina', 'silla comedor', 'silla ejecutiva',
+      'mesa', 'mesa comedor', 'mesa centro',
+      'escritorio', 'escritorio gamer', 'escritorio oficina',
+      'cama', 'sofa', 'sillon', 'banco',
+      // Almacenaje
+      'archivero', 'cajonera', 'librero', 'organizador', 'ropero', 'buro',
+      // Conjuntos
+      'set comedor', 'paquete comedor', 'paquete recamara', 'paquete oficina',
+      // Otros
+      'mueble tv', 'mesa trabajo', 'home office'
+    ];
+
+    // Autocompletado: obtener sugerencias basadas en lo que escribe el usuario
+    function getAutocompleteSuggestions(input) {
+      if (!input || input.length < 2) return [];
+
+      const lower = input.toLowerCase().trim();
+      const normalized = lower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // Buscar coincidencias en términos populares
+      const startsWith = [];
+      const includes = [];
+
+      popularSearchTerms.forEach(term => {
+        const normalizedTerm = term.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (normalizedTerm.startsWith(normalized)) {
+          startsWith.push(term);
+        } else if (normalizedTerm.includes(normalized)) {
+          includes.push(term);
+        }
+      });
+
+      // Priorizar términos que empiezan con la búsqueda
+      return [...startsWith, ...includes].slice(0, 5); // Máximo 5 sugerencias
+    }
+
+    // Obtener términos de búsqueda basados en contexto
+    function getSearchTerms(term) {
+      const lower = term.toLowerCase().trim();
+      const normalized = lower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const words = normalized.split(/\s+/);
+      const terms = [];
+
+      // 1. Verificar si es un contexto específico
+      if (contextualSynonyms[normalized]) {
+        // console.log('🏠 Contexto detectado:', normalized);
+        // Retornar solo los 4 términos más relevantes para evitar sobrecarga
+        return contextualSynonyms[normalized].slice(0, 4);
+      }
+
+      // 2. Verificar cada palabra
+      words.forEach(word => {
+        if (contextualSynonyms[word]) {
+          // console.log('🏠 Contexto en palabra:', word);
+          terms.push(...contextualSynonyms[word].slice(0, 3));
+        } else if (directSynonyms[word]) {
+          terms.push(...directSynonyms[word]);
+        }
+      });
+
+      // Si encontramos sinónimos, usarlos. Si no, usar el término original
+      if (terms.length > 0) {
+        return [...new Set(terms)].slice(0, 4);
+      }
+
+      return [term];
+    }
+
+    const types = ['products', 'pages', 'articles'];
+    const lists = {
+      products: container.querySelector('[data-predictive-list="products"]'),
+      pages: container.querySelector('[data-predictive-list="pages"]'),
+      articles: container.querySelector('[data-predictive-list="articles"]'),
+    };
+    const sections = {
+      products: container.querySelector('[data-predictive-section="products"]'),
+      pages: container.querySelector('[data-predictive-section="pages"]'),
+      articles: container.querySelector('[data-predictive-section="articles"]'),
+    };
+    const emptyState = container.querySelector('[data-predictive-empty]');
+    const emptyParagraph = emptyState ? emptyState.querySelector('p') : null;
+    const defaultEmptyMessage = emptyParagraph ? emptyParagraph.textContent : 'No encontramos resultados para tu búsqueda.';
+    const errorMessage = 'Ocurrió un error al cargar la búsqueda. Intenta de nuevo.';
+
+    // Referencias para autocompletado
+    const autocompleteContainer = container.querySelector('[data-autocomplete-suggestions]');
+    const suggestionsList = container.querySelector('[data-suggestions-list]');
+    let selectedSuggestionIndex = -1;
+
+    let debounceTimer;
+    let controller;
+    let lastQuery = '';
+
+    container.dataset.hasResults = container.dataset.hasResults || 'false';
+    searchField.setAttribute('aria-expanded', 'false');
+    if (!searchField.hasAttribute('aria-controls') && container.id) {
+      searchField.setAttribute('aria-controls', container.id);
+    }
+    container.setAttribute('aria-hidden', 'true');
+
+    const resetLists = () => {
+      types.forEach((type) => {
+        const list = lists[type];
+        const section = sections[type];
+        if (list) list.innerHTML = '';
+        if (section) section.hidden = true;
+      });
+    };
+
+    const clearResults = () => {
+      resetLists();
+      clearSuggestions();
+      if (emptyState) {
+        emptyState.hidden = true;
+        if (emptyParagraph) emptyParagraph.textContent = defaultEmptyMessage;
+      }
+
+      // Ocultar botón "Ver todos"
+      const viewAllContainer = container.querySelector('[data-view-all-results]');
+      if (viewAllContainer) viewAllContainer.hidden = true;
+
+      container.dataset.hasResults = 'false';
+    };
+
+    // Funciones de autocompletado
+    const renderSuggestions = (suggestions) => {
+      if (!suggestionsList || !autocompleteContainer) return;
+
+      suggestionsList.innerHTML = '';
+      selectedSuggestionIndex = -1;
+
+      if (suggestions.length === 0) {
+        autocompleteContainer.hidden = true;
+        return;
+      }
+
+      suggestions.forEach((suggestion, index) => {
+        const li = document.createElement('li');
+        li.className = 'predictive-search__suggestion';
+        li.dataset.suggestion = suggestion;
+        li.dataset.index = index;
+        li.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          ${suggestion}
+        `;
+
+        li.addEventListener('click', () => {
+          searchField.value = suggestion;
+          lastQuery = ''; // Forzar nueva búsqueda
+
+          // Actualizar sugerencias basadas en el nuevo valor
+          const newSuggestions = getAutocompleteSuggestions(suggestion);
+          if (newSuggestions.length > 0) {
+            renderSuggestions(newSuggestions);
+          } else {
+            clearSuggestions();
+          }
+
+          // Ejecutar búsqueda de productos
+          scheduleFetch(suggestion);
+        });
+
+        suggestionsList.appendChild(li);
+      });
+
+      autocompleteContainer.hidden = false;
+    };
+
+    const clearSuggestions = () => {
+      if (autocompleteContainer) autocompleteContainer.hidden = true;
+      if (suggestionsList) suggestionsList.innerHTML = '';
+      selectedSuggestionIndex = -1;
+    };
+
+    const createMobileOverlay = () => {
+      let overlay = document.getElementById('search-overlay-' + sectionId);
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'search-overlay-' + sectionId;
+        overlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.3);
+          z-index: 1100;
+          display: none;
+        `;
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', () => {
+          toggleContainer(false);
+        });
+
+        overlay.addEventListener('touchstart', () => {
+          toggleContainer(false);
+        });
+      }
+      return overlay;
+    };
+
+    const toggleContainer = (open) => {
+      if (open) {
+        container.hidden = false;
+        container.setAttribute('data-open', 'true');
+        container.setAttribute('aria-hidden', 'false');
+        searchField.setAttribute('aria-expanded', 'true');
+      } else {
+        container.hidden = true;
+        container.removeAttribute('data-open');
+        container.setAttribute('aria-hidden', 'true');
+        searchField.setAttribute('aria-expanded', 'false');
+      }
+
+      if (window.innerWidth <= 960) {
+        const overlay = createMobileOverlay();
+        if (open && container.dataset.open === 'true') {
+          overlay.style.display = 'block';
+        } else {
+          overlay.style.display = 'none';
+        }
+      }
+    };
+
+    const resolveImage = (resource) => {
+      const candidates = [
+        resource?.image?.url,
+        resource?.image?.src,
+        resource?.featured_image?.url,
+        resource?.featured_image?.src,
+        typeof resource?.featured_image === 'string' ? resource.featured_image : '',
+        resource?.featured_media?.preview_image?.src,
+        resource?.media?.[0]?.preview_image?.src,
+        resource?.media?.[0]?.src,
+        resource?.images?.[0]?.url,
+        resource?.images?.[0]?.src,
+      ];
+      return candidates.find((value) => typeof value === 'string' && value.trim().length) || '';
+    };
+
+    const buildItem = (resource) => {
+      const item = document.createElement('li');
+      item.className = 'predictive-search__item';
+
+      const link = document.createElement('a');
+      link.className = 'predictive-search__link';
+      link.href = resource?.url || '#';
+
+      const thumb = document.createElement('span');
+      thumb.className = 'predictive-search__thumb';
+
+      const imageUrl = resolveImage(resource);
+      if (imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = resource?.title || '';
+        thumb.appendChild(img);
+      } else {
+        thumb.classList.add('predictive-search__thumb--placeholder');
+        const fallback = (resource?.title || resource?.query || '').trim().charAt(0).toUpperCase();
+        thumb.textContent = fallback || '#';
+      }
+
+      const title = document.createElement('span');
+      title.className = 'predictive-search__title';
+      title.textContent = resource?.title || resource?.query || '';
+
+      link.append(thumb, title);
+      item.appendChild(link);
+      return item;
+    };
+
+    const renderResults = (resultsByType, query) => {
+      let hasResults = false;
+
+      types.forEach((type) => {
+        const list = lists[type];
+        const section = sections[type];
+        const items = Array.isArray(resultsByType[type]) ? resultsByType[type] : [];
+
+        if (!list || !section) return;
+
+        list.innerHTML = '';
+
+        if (!items.length) {
+          section.hidden = true;
+          return;
+        }
+
+        items.forEach((entry) => {
+          list.appendChild(buildItem(entry));
+        });
+
+        section.hidden = false;
+        hasResults = true;
+      });
+
+      container.dataset.hasResults = hasResults ? 'true' : 'false';
+
+      // Mostrar botón "Ver todos los resultados"
+      const viewAllContainer = container.querySelector('[data-view-all-results]');
+      const viewAllLink = container.querySelector('[data-view-all-link]');
+
+      if (viewAllContainer && viewAllLink && hasResults && query) {
+        viewAllLink.href = `/search?q=${encodeURIComponent(query)}`;
+        viewAllContainer.hidden = false;
+      } else if (viewAllContainer) {
+        viewAllContainer.hidden = true;
+      }
+
+      if (emptyState) {
+        emptyState.hidden = hasResults;
+        if (!hasResults && emptyParagraph) {
+          emptyParagraph.textContent = defaultEmptyMessage;
+        }
+      }
+
+      toggleContainer(true);
+    };
+
+    const handleError = () => {
+      resetLists();
+      container.dataset.hasResults = 'false';
+
+      // Ocultar botón "Ver todos"
+      const viewAllContainer = container.querySelector('[data-view-all-results]');
+      if (viewAllContainer) viewAllContainer.hidden = true;
+
+      if (emptyState) {
+        if (emptyParagraph) {
+          emptyParagraph.textContent = errorMessage;
+        } else {
+          emptyState.textContent = errorMessage;
+        }
+        emptyState.hidden = false;
+      }
+      toggleContainer(true);
+    };
+
+    const fetchPredictiveResults = async (query) => {
+      if (controller) controller.abort();
+      controller = new AbortController();
+
+      // Obtener términos de búsqueda con sinónimos contextuales
+      const searchTerms = getSearchTerms(query);
+      // console.log('🔍 Buscando:', searchTerms);
+
+      try {
+        // Hacer búsquedas paralelas para cada término
+        const promises = searchTerms.map(term =>
+          fetch(`/search/suggest.json?q=${encodeURIComponent(term)}&resources[type]=product,page,article&resources[limit]=10&resources[limit_scope]=each`, {
+            signal: controller.signal,
+            headers: {
+              Accept: 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+            }
+          })
+          .then(res => res.ok ? res.json() : null)
+          .catch(() => null)
+        );
+
+        const responses = await Promise.all(promises);
+
+        if (searchField.value.trim() !== query) return;
+
+        // Combinar resultados únicos
+        const combinedResults = {
+          products: [],
+          pages: [],
+          articles: []
+        };
+
+        const seenIds = {
+          products: new Set(),
+          pages: new Set(),
+          articles: new Set()
+        };
+
+        responses.forEach(payload => {
+          if (!payload?.resources?.results) return;
+
+          const results = payload.resources.results;
+
+          // Agregar productos únicos
+          if (Array.isArray(results.products)) {
+            results.products.forEach(product => {
+              if (!seenIds.products.has(product.id)) {
+                seenIds.products.add(product.id);
+                combinedResults.products.push(product);
+              }
+            });
+          }
+
+          // Agregar páginas únicas
+          if (Array.isArray(results.pages)) {
+            results.pages.forEach(page => {
+              if (!seenIds.pages.has(page.id)) {
+                seenIds.pages.add(page.id);
+                combinedResults.pages.push(page);
+              }
+            });
+          }
+
+          // Agregar artículos únicos
+          if (Array.isArray(results.articles)) {
+            results.articles.forEach(article => {
+              if (!seenIds.articles.has(article.id)) {
+                seenIds.articles.add(article.id);
+                combinedResults.articles.push(article);
+              }
+            });
+          }
+        });
+
+        // Limitar resultados para el preview
+        combinedResults.products = combinedResults.products.slice(0, 6);
+        combinedResults.pages = combinedResults.pages.slice(0, 3);
+        combinedResults.articles = combinedResults.articles.slice(0, 3);
+
+        // console.log('✅ Resultados encontrados:', combinedResults.products.length, 'productos');
+
+        renderResults(combinedResults, query);
+
+        if (!combinedResults.products.length && !combinedResults.pages.length && !combinedResults.articles.length && emptyState) {
+          emptyState.hidden = false;
+          if (emptyParagraph) emptyParagraph.textContent = defaultEmptyMessage;
+        }
+
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        if (searchField.value.trim() !== query) return;
+        handleError();
+      }
+    };
+
+    const scheduleFetch = (query) => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchPredictiveResults(query);
+      }, 220);
+    };
+
+    searchField.addEventListener('input', (event) => {
+      const query = event.target.value.trim();
+
+      // Caso 1: Menos de 2 caracteres - limpiar todo
+      if (query.length < 2) {
+        if (controller) controller.abort();
+        clearResults();
+        clearSuggestions();
+        toggleContainer(false);
+        lastQuery = '';
+        return;
+      }
+
+      // Caso 2: Exactamente 2 caracteres - solo mostrar sugerencias
+      if (query.length === 2) {
+        if (controller) controller.abort();
+        clearResults(); // Limpiar resultados previos
+        const suggestions = getAutocompleteSuggestions(query);
+        renderSuggestions(suggestions);
+
+        if (suggestions.length > 0) {
+          toggleContainer(true);
+        } else {
+          toggleContainer(false);
+        }
+        lastQuery = '';
+        return;
+      }
+
+      // Caso 3: 3+ caracteres - mostrar sugerencias + hacer búsqueda completa
+      if (query.length >= MIN_QUERY_LENGTH) {
+        if (query === lastQuery) return;
+
+        lastQuery = query;
+
+        // Mostrar sugerencias si hay coincidencias
+        const suggestions = getAutocompleteSuggestions(query);
+        if (suggestions.length > 0) {
+          renderSuggestions(suggestions);
+        } else {
+          clearSuggestions();
+        }
+
+        scheduleFetch(query);
+      }
+    });
+
+    searchField.addEventListener('focus', () => {
+      const query = searchField.value.trim();
+      if (query.length >= MIN_QUERY_LENGTH && container.dataset.hasResults === 'true') {
+        toggleContainer(true);
+      }
+    });
+
+    wrapper.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        toggleContainer(false);
+        searchField.focus();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!wrapper.contains(event.target)) {
+        toggleContainer(false);
+      }
+    });
+
+    document.addEventListener('touchstart', (event) => {
+      if (!wrapper.contains(event.target)) {
+        toggleContainer(false);
+      }
+    });
+
+    // Search on Enter or click SVG
+    const performSearch = () => {
+      const q = searchField.value.trim();
+      if (!q) return;
+      const query = encodeURIComponent(q);
+      const url = `/search?q=${query}`;
+      window.location.assign(url);
+    };
+
+    searchField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') performSearch();
+    });
+
+    const searchIcon = wrapper.querySelector('.search-field svg');
+    if (searchIcon) {
+      searchIcon.addEventListener('click', performSearch);
+    }
+  })();
+
+  // Desktop menu hover interactions
+  (function() {
+    const nav = document.querySelector('.custom-nav-megamenu');
+    if (!nav) return;
+
+    const desktopBreakpoint = 960;
+    const topDetails = Array.from(nav.querySelectorAll(':scope > ul > li > details[data-navmenu-details]'));
+    const timers = new WeakMap();
+
+    const clearTimer = (detail) => {
+      const existing = timers.get(detail);
+      if (existing) {
+        clearTimeout(existing);
+        timers.delete(detail);
+      }
+    };
+
+    const closeDetail = (detail) => {
+      clearTimer(detail);
+      detail.removeAttribute('open');
+    };
+
+    const closeSiblings = (detail) => {
+      topDetails.forEach((other) => {
+        if (other !== detail) closeDetail(other);
+      });
+    };
+
+    const scheduleClose = (detail) => {
+      clearTimer(detail);
+      const timer = setTimeout(() => closeDetail(detail), 300);
+      timers.set(detail, timer);
+    };
+
+    const handleOpen = (detail) => {
+      closeSiblings(detail);
+      detail.setAttribute('open', '');
+      clearTimer(detail);
+    };
+
+    topDetails.forEach((detail) => {
+      const summary = detail.querySelector('summary');
+
+      detail.addEventListener('mouseenter', () => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+        handleOpen(detail);
+      });
+
+      detail.addEventListener('mouseleave', () => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+        scheduleClose(detail);
+      });
+
+      detail.addEventListener('focusin', () => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+        handleOpen(detail);
+      });
+
+      detail.addEventListener('focusout', (event) => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+        if (!detail.contains(event.relatedTarget)) {
+          scheduleClose(detail);
+        }
+      });
+
+      if (summary) {
+        summary.addEventListener('click', (event) => {
+          if (window.innerWidth <= desktopBreakpoint) return;
+
+          event.preventDefault();
+
+          const href = summary.getAttribute('data-href');
+          if (detail.hasAttribute('open')) {
+            if (href && href !== '#') {
+              window.location.href = href;
+            } else {
+              closeDetail(detail);
+            }
+          } else {
+            handleOpen(detail);
+          }
+        });
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > desktopBreakpoint) return;
+      topDetails.forEach((detail) => closeDetail(detail));
+    });
+
+    // Hover interactions for second and third level menus
+    const allDetails = nav.querySelectorAll('details[data-navmenu-details]');
+    allDetails.forEach((detail) => {
+      const isTopLevel = topDetails.includes(detail);
+      if (isTopLevel) return; // Already handled above
+
+      const parentLi = detail.closest('li');
+      const summary = detail.querySelector('summary');
+
+      // Mark as hover-controlled
+      detail.dataset.hoverControlled = 'true';
+
+      detail.addEventListener('mouseenter', () => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+
+        // Cancel any pending close timer
+        if (detail.dataset.closeTimer) {
+          clearTimeout(detail.dataset.closeTimer);
+          delete detail.dataset.closeTimer;
+        }
+
+        // Close sibling submenus at the same level to prevent overlap
+        const siblings = parentLi.parentElement.querySelectorAll(':scope > li > details[data-navmenu-details]');
+        siblings.forEach((sibling) => {
+          if (sibling !== detail) {
+            sibling.removeAttribute('open');
+            // Close all nested menus too
+            const nestedDetails = sibling.querySelectorAll('details[data-navmenu-details]');
+            nestedDetails.forEach(nested => nested.removeAttribute('open'));
+          }
+        });
+
+        detail.setAttribute('open', '');
+      });
+
+      detail.addEventListener('mouseleave', () => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+        const timer = setTimeout(() => {
+          detail.removeAttribute('open');
+          // Close all nested menus
+          const nestedDetails = detail.querySelectorAll('details[data-navmenu-details]');
+          nestedDetails.forEach(nested => nested.removeAttribute('open'));
+        }, 300);
+        detail.dataset.closeTimer = timer;
+      });
+
+      // Prevent ALL click/toggle behavior on desktop - use capture phase
+      detail.addEventListener('toggle', (event) => {
+        if (window.innerWidth <= desktopBreakpoint) return;
+        if (detail.dataset.hoverControlled === 'true') {
+          // If we didn't set it via hover, prevent it
+          if (!detail.dataset.allowToggle) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+          delete detail.dataset.allowToggle;
+        }
+      }, true);
+
+      if (summary) {
+        // Prevent default click behavior on desktop for levels 2 and 3
+        summary.addEventListener('click', (event) => {
+          if (window.innerWidth <= desktopBreakpoint) return;
+
+          // Always prevent default to disable click-to-open
+          event.preventDefault();
+          event.stopPropagation();
+
+          // Only navigate if already open and has valid href
+          const href = summary.getAttribute('data-href');
+          if (detail.hasAttribute('open') && href && href !== '#') {
+            window.location.href = href;
+          }
+        }, true);
+
+        // Prevent toggle behavior on summary click
+        summary.addEventListener('mousedown', (event) => {
+          if (window.innerWidth <= desktopBreakpoint) return;
+          event.preventDefault();
+        }, true);
+      }
+    });
+  })();
+
+  // Handle data-href clicks on summary elements (mobile only for submenus)
+  (function() {
+    const summariesWithHref = document.querySelectorAll('summary[data-href]');
+
+    summariesWithHref.forEach(summary => {
+      summary.addEventListener('click', (event) => {
+        const href = summary.getAttribute('data-href');
+        const details = summary.closest('details');
+        const nav = summary.closest('.custom-nav-megamenu');
+
+        // Only handle mobile OR top-level items
+        if (window.innerWidth > 960) {
+          // On desktop, only handle if it's a top-level item
+          const isTopLevel = nav && details && details.parentElement.closest('ul').classList.contains('nav-menu');
+          if (!isTopLevel) {
+            return; // Let the hover handler deal with it
+          }
+        }
+
+        // Mobile or top-level navigation
+        if (href && href !== '#') {
+          if (window.innerWidth > 960) {
+            if (details && !details.hasAttribute('open')) {
+              return;
+            }
+            window.location.href = href;
+          } else {
+            window.location.href = href;
+          }
+        }
+      });
+    });
+  })();
+
+  // Mobile sidebar
+  (function() {
+    const sectionId = '{{ section.id }}';
+    const openButton = document.querySelector('.menu-toggle');
+    const sidebar = document.getElementById('mobile-sidebar-' + sectionId);
+    const overlay = document.getElementById('mobile-sidebar-overlay-' + sectionId);
+
+    if (!openButton || !sidebar || !overlay) {
+      return;
+    }
+
+    const closeButton = sidebar.querySelector('.mobile-sidebar__close');
+
+    const openSidebar = () => {
+      sidebar.dataset.open = 'true';
+      sidebar.setAttribute('aria-hidden', 'false');
+      overlay.dataset.open = 'true';
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('sidebar-open');
+    };
+
+    const closeSidebar = () => {
+      sidebar.dataset.open = 'false';
+      sidebar.setAttribute('aria-hidden', 'true');
+      overlay.dataset.open = 'false';
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('sidebar-open');
+    };
+
+    openButton.addEventListener('click', openSidebar);
+
+    if (closeButton) {
+      closeButton.addEventListener('click', closeSidebar);
+    }
+
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && sidebar.dataset.open === 'true') {
+        closeSidebar();
+      }
+    });
+  })();
+
+  /**
+   * SOLUCIÓN AL PROBLEMA: Header desaparece al agregar productos al carrito
+   *
+   * PROBLEMA IDENTIFICADO:
+   * 1. Al hacer scroll hacia abajo, el header obtiene la clase 'scrolled'
+   * 2. Al agregar un producto al carrito, el scroll cambia temporalmente (ej: de 809px a 575px)
+   * 3. Esto causa que handleScroll() quite la clase 'scrolled'
+   * 4. El header desaparece momentáneamente
+   * 5. Al abrir el cart drawer, el dialog fija el body (position: fixed) con top negativo
+   * 6. Esto hace que window.scrollY cambie a 0 temporalmente
+   * 7. handleScroll() se ejecuta y quita la clase 'scrolled' porque scrollY < 50
+   *
+   * SOLUCIÓN IMPLEMENTADA:
+   * 1. Detectar cuando se agrega algo al carrito (evento 'cart:update')
+   * 2. Congelar el estado del header por 1 segundo (freezeHeaderState = true)
+   * 3. Bloquear handleScroll() mientras está congelado
+   * 4. Usar MutationObserver para restaurar automáticamente la clase 'scrolled' si se quita
+   * 5. Detectar cuando se abre el drawer (interceptando open() y showDialog())
+   * 6. Guardar el estado del header antes de abrir (headerHadScrolledBeforeDialog)
+   * 7. Mantener la protección activa mientras el dialog está abierto y 350ms después de cerrar
+   *
+   * EVENTOS CLAVE:
+   * - cart:update: Se dispara al agregar producto al carrito
+   * - dialog:open/close: Se disparan al abrir/cerrar el cart drawer
+   *
+   * VARIABLES DE ESTADO:
+   * - freezeHeaderState: Congela handleScroll por 1 seg después de cart:update
+   * - headerHadScrolledBeforeDialog: Guarda si el header tenía scrolled antes de abrir drawer
+   */
+  document.addEventListener('DOMContentLoaded', function() {
+    const header = document.querySelector('header.custom-header-megamenu');
+    if (!header) return;
+
+    const headerGroup = document.getElementById('header-group');
+    const searchElement = header.querySelector('.search');
+    let headerHeight = 0;
+    let lastScroll = 0;
+    let headerHadScrolledBeforeDialog = false;
+    let freezeHeaderState = false;
+
+    // Interceptar métodos del cart-drawer para detectar cuando se abre/cierra
+    customElements.whenDefined('cart-drawer-component').then(() => {
+      const cartDrawer = document.querySelector('cart-drawer-component');
+      if (!cartDrawer) return;
+
+      // Interceptar open() - se llama al hacer clic en el ícono del carrito
+      if (cartDrawer.open) {
+        const originalOpen = cartDrawer.open.bind(cartDrawer);
+        cartDrawer.open = function() {
+          if (!headerHadScrolledBeforeDialog) {
+            headerHadScrolledBeforeDialog = header.classList.contains('scrolled');
+          }
+          return originalOpen();
+        };
+      }
+
+      // Interceptar showDialog() - se llama internamente por open()
+      if (cartDrawer.showDialog) {
+        const originalShowDialog = cartDrawer.showDialog.bind(cartDrawer);
+        cartDrawer.showDialog = function() {
+          if (!headerHadScrolledBeforeDialog) {
+            headerHadScrolledBeforeDialog = header.classList.contains('scrolled');
+          }
+          return originalShowDialog();
+        };
+      }
+
+      // Interceptar close() - se llama al cerrar el drawer
+      if (cartDrawer.close) {
+        const originalClose = cartDrawer.close.bind(cartDrawer);
+        cartDrawer.close = function() {
+          const result = originalClose();
+          setTimeout(function() {
+            headerHadScrolledBeforeDialog = false;
+          }, 350);
+          return result;
+        };
+      }
+
+      // Interceptar closeDialog() - se llama internamente por close()
+      if (cartDrawer.closeDialog) {
+        const originalCloseDialog = cartDrawer.closeDialog.bind(cartDrawer);
+        cartDrawer.closeDialog = function() {
+          const result = originalCloseDialog();
+          setTimeout(function() {
+            headerHadScrolledBeforeDialog = false;
+          }, 350);
+          return result;
+        };
+      }
+    });
+
+    function handleScroll() {
+      // Bloquear handleScroll si:
+      // 1. El estado está congelado por cart:update (freezeHeaderState)
+      // 2. El drawer está abierto o cerrándose (headerHadScrolledBeforeDialog)
+      if (freezeHeaderState || headerHadScrolledBeforeDialog) {
+        return;
+      }
+
+      const currentScroll = window.pageYOffset || window.scrollY;
+      const isMobile = window.innerWidth <= 640;
+
+      if (currentScroll > 50) {
+        if (!header.classList.contains('scrolled')) {
+          headerHeight = header.offsetHeight;
+          header.classList.add('scrolled');
+          if (headerGroup) {
+            headerGroup.style.paddingBottom = headerHeight + 'px';
+          }
+        }
+
+        // Mobile: ocultar/mostrar búsqueda según dirección de scroll
+        if (isMobile && searchElement) {
+          if (currentScroll > lastScroll && currentScroll > 100) {
+            header.classList.add('hide-search');
+          } else if (currentScroll < lastScroll) {
+            header.classList.remove('hide-search');
+          }
+        }
+      } else {
+        // Solo quitar scrolled si el body no está fixed (no hay dialog abierto)
+        if (document.body.style.position !== 'fixed') {
+          header.classList.remove('scrolled');
+          header.classList.remove('hide-search');
+          if (headerGroup) {
+            headerGroup.style.paddingBottom = '0';
+          }
+        }
+      }
+
+      lastScroll = currentScroll;
+    }
+
+    // MutationObserver para proteger la clase 'scrolled' durante cart:update y dialogs
+    // Restaura automáticamente la clase si algo intenta quitarla mientras está protegida
+    const headerObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const hasScrolled = header.classList.contains('scrolled');
+          const currentScroll = window.scrollY;
+
+          // Restaurar la clase 'scrolled' si:
+          // 1. El header tenía scrolled antes de abrir el drawer (headerHadScrolledBeforeDialog)
+          // 2. O el estado está congelado por cart:update (freezeHeaderState) y scroll > 50
+          if (!hasScrolled && (headerHadScrolledBeforeDialog || (freezeHeaderState && currentScroll > 50))) {
+            headerObserver.disconnect();
+            header.classList.add('scrolled');
+            if (headerGroup) {
+              if (headerHeight === 0) {
+                headerHeight = header.offsetHeight;
+              }
+              headerGroup.style.paddingBottom = headerHeight + 'px';
+            }
+            headerObserver.observe(header, {
+              attributes: true,
+              attributeFilter: ['class']
+            });
+          }
+        }
+      });
+    });
+
+    headerObserver.observe(header, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Congelar el estado del header cuando se agrega algo al carrito
+    // Esto previene que handleScroll quite la clase 'scrolled' durante el cambio temporal de scroll
+    document.addEventListener('cart:update', function() {
+      freezeHeaderState = true;
+      setTimeout(function() {
+        freezeHeaderState = false;
+      }, 1000); // 1 segundo de protección
+    });
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Header Custom Megamenu",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Barra Superior"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_bar",
+      "label": "Mostrar barra superior",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "top_bar_text",
+      "label": "Texto de la barra superior",
+      "default": "Dudas, Atención Personalizada y Cotizaciones Express:"
+    },
+    {
+      "type": "text",
+      "id": "top_bar_phone",
+      "label": "Teléfono",
+      "default": "+52 55 4192 9961"
+    },
+    {
+      "type": "html",
+      "id": "custom_top_bar_code",
+      "label": "Código HTML/CSS/JS personalizado (cuando la barra está oculta)",
+      "info": "Este código se mostrará cuando 'Mostrar barra superior' esté desactivado. Puedes usar HTML, CSS y JavaScript aquí."
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Ancho del logo",
+      "min": 50,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 260
+    },
+    {
+      "type": "header",
+      "content": "Búsqueda"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Mostrar búsqueda",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Placeholder de búsqueda",
+      "default": "¿Qué estás buscando?"
+    },
+    {
+      "type": "text",
+      "id": "search_products_title",
+      "label": "Título de productos",
+      "default": "Productos"
+    },
+    {
+      "type": "text",
+      "id": "search_pages_title",
+      "label": "Título de páginas",
+      "default": "Páginas"
+    },
+    {
+      "type": "text",
+      "id": "search_articles_title",
+      "label": "Título de blogs",
+      "default": "Blogs"
+    },
+    {
+      "type": "text",
+      "id": "search_no_results_text",
+      "label": "Texto sin resultados",
+      "default": "No encontramos resultados para tu búsqueda."
+    },
+    {
+      "type": "header",
+      "content": "Enlaces de Acción"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sucursales_link",
+      "label": "Mostrar enlace de sucursales",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sucursales_text",
+      "label": "Texto de sucursales",
+      "default": "Sucursales"
+    },
+    {
+      "type": "url",
+      "id": "sucursales_link",
+      "label": "Enlace de sucursales"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account_icon",
+      "label": "Mostrar icono de cuenta",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_icon",
+      "label": "Mostrar icono de carrito",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Menú de Navegación"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menú principal",
+      "default": "main-menu",
+      "info": "Selecciona el menú que deseas mostrar. Puedes editarlo en Navegación."
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "color_teal_dark",
+      "label": "Color teal oscuro",
+      "default": "#0f5259"
+    },
+    {
+      "type": "color",
+      "id": "color_teal",
+      "label": "Color teal",
+      "default": "#2e6f75"
+    },
+    {
+      "type": "color",
+      "id": "color_teal_light",
+      "label": "Color teal claro",
+      "default": "#6aa9b3"
+    },
+    {
+      "type": "color",
+      "id": "color_text_main",
+      "label": "Color texto principal",
+      "default": "#2b2c30"
+    },
+    {
+      "type": "color",
+      "id": "color_text_muted",
+      "label": "Color texto secundario",
+      "default": "#5f6167"
+    },
+    {
+      "type": "color",
+      "id": "color_bg_body",
+      "label": "Color fondo",
+      "default": "#ffffff"
+    }
+  ]
+}
+{% endschema %}

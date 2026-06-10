@@ -1,0 +1,326 @@
+<style>
+  .site-footer{background-color:{{ section.settings.footer_bg_color }};color:{{ section.settings.footer_text_color }};padding:60px 5% 20px;font-size:14px;contain:layout style}
+  .footer-main-container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;padding:0 1.5rem 40px;max-width:1440px;margin-inline:auto}
+  .footer-column{flex:1;min-width:220px}
+  .footer-column .logo{max-width:150px;margin-bottom:20px;height:auto}
+  .footer-column h3{font-size:16px;font-weight:600;margin:0 0 20px}
+  .footer-column p{line-height:1.6;color:rgba(255,255,255,.9);margin:0 0 10px}
+  .footer-column ul{list-style:none;padding:0;margin:0}
+  .footer-column ul li{margin-bottom:12px}
+  .footer-column ul li a,.footer-bottom-links a{color:rgba(255,255,255,.9);text-decoration:none;transition:color .3s ease;will-change:color}
+  .footer-column ul li a:hover,.footer-bottom-links a:hover{color:#fff;text-decoration:underline}
+  .social-icons{display:flex;flex-wrap:wrap;gap:12px;margin-top:15px}
+  .social-link{display:flex;align-items:center;justify-content:center;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:50%;transition:background-color .3s ease,border-color .3s ease;will-change:background-color,border-color}
+  .social-link:hover{background-color:rgba(255,255,255,.1);border-color:#fff}
+  .social-link svg{fill:currentColor;width:40px;height:40px}
+  .footer-divider{border:0;border-top:1px solid rgba(255,255,255,.2);margin:0}
+  .footer-bottom{padding-top:30px;text-align:center}
+  .footer-bottom-links{display:flex;justify-content:center;flex-wrap:wrap;gap:15px 30px;margin-bottom:25px}
+  .footer-credits{font-size:13px;color:rgba(255,255,255,.7)}
+  .footer-credits p{margin:0 0 15px}
+
+  /* Payment icons */
+  .payment-icons{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:4px;list-style:none;padding:0}
+  .payment-icons li{display:inline-flex}
+  .payment-icons svg{height:24px;width:auto;display:block;border-radius:3px}
+
+  @media(max-width:990px){.footer-main-container{flex-direction:column;text-align:center}.footer-column .logo{margin-inline:auto}.social-icons{justify-content:center}}
+</style>
+
+
+{%- liquid
+  assign social_links = section.blocks | where: 'type', 'social_link'
+  assign nav_links = section.blocks | where: 'type', 'navigation_link'
+  assign info_links = section.blocks | where: 'type', 'info_link'
+  assign bottom_links = section.blocks | where: 'type', 'bottom_link'
+-%}
+<footer class="site-footer">
+  <div class="footer-main-container">
+    {%- if section.settings.show_social_column -%}
+    <div class="footer-column">
+      <a href="/" aria-label="{{ shop.name }}">
+        {%- if section.settings.footer_logo != blank -%}
+          <img class="logo" src="{{ section.settings.footer_logo | image_url: width: 300 }}" alt="{{ shop.name }}" width="150" height="auto" loading="lazy" decoding="async">
+        {%- else -%}
+          <img class="logo" src="https://cdn.shopify.com/s/files/1/1233/2374/files/Frame_2_1.png?v=1757454576" alt="{{ shop.name }}" width="150" height="auto" loading="lazy" decoding="async">
+        {%- endif -%}
+      </a>
+      <h3>{{ section.settings.social_title }}</h3>
+      <div class="social-icons">
+        {%- for block in social_links -%}
+          <a class="social-link" title="{{ block.settings.title }}" href="{{ block.settings.url }}" target="_blank" rel="noopener">{{ block.settings.icon }}</a>
+        {%- endfor -%}
+      </div>
+    </div>
+    {%- endif -%}
+    {%- if section.settings.show_navigation_column -%}
+    <div class="footer-column">
+      <h3>{{ section.settings.navigation_title }}</h3>
+      <ul>
+        {%- for block in nav_links -%}
+          <li><a href="{{ block.settings.url }}">{{ block.settings.label }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+    {%- endif -%}
+    {%- if section.settings.show_info_column -%}
+    <div class="footer-column">
+      <h3>{{ section.settings.info_title }}</h3>
+      <ul>
+        {%- for block in info_links -%}
+          <li><a href="{{ block.settings.url }}"{% if block.settings.target_blank %} target="_blank" rel="noopener"{% endif %}>{{ block.settings.label }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+    {%- endif -%}
+    {%- if section.settings.show_contact_column -%}
+    <div class="footer-column">
+      <h3>{{ section.settings.contact_title }}</h3>
+      <p>{{ section.settings.contact_phone }}</p>
+      <p>{{ section.settings.contact_hours_weekday }}</p>
+      <p>{{ section.settings.contact_hours_saturday }}</p>
+    </div>
+    {%- endif -%}
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-bottom">
+    {%- if section.settings.show_bottom_links -%}
+    <div class="footer-bottom-links">
+      {%- for block in bottom_links -%}
+        <a href="{{ block.settings.url }}">{{ block.settings.label }}</a>
+      {%- endfor -%}
+    </div>
+    {%- endif -%}
+    <div class="footer-credits">
+      <p>{{ section.settings.copyright_text }}</p>
+      <ul class="payment-icons" role="list" aria-label="Métodos de pago aceptados">
+        {%- assign payment_methods = 'paypal,visa,master,american_express,apple_pay,google_pay' | split: ',' -%}
+        {%- for method in payment_methods -%}
+          <li>{{ method | payment_type_svg_tag }}</li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer Custom",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "footer_bg_color",
+      "label": "Color de fondo",
+      "default": "#184e56"
+    },
+    {
+      "type": "color",
+      "id": "footer_text_color",
+      "label": "Color de texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Columna de Redes Sociales"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_column",
+      "label": "Mostrar columna de redes sociales",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Logo del footer"
+    },
+    {
+      "type": "text",
+      "id": "social_title",
+      "label": "Título de redes sociales",
+      "default": "Síguenos"
+    },
+    {
+      "type": "header",
+      "content": "Columna de Navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation_column",
+      "label": "Mostrar columna de navegación",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "navigation_title",
+      "label": "Título de navegación",
+      "default": "Navegación"
+    },
+    {
+      "type": "header",
+      "content": "Columna de Más Información"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_info_column",
+      "label": "Mostrar columna de más información",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "info_title",
+      "label": "Título de más información",
+      "default": "Más Información"
+    },
+    {
+      "type": "header",
+      "content": "Columna de Contacto"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_column",
+      "label": "Mostrar columna de contacto",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_title",
+      "label": "Título de contacto",
+      "default": "Contáctanos"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Teléfono",
+      "default": "Atención al cliente 55 4192 9961"
+    },
+    {
+      "type": "text",
+      "id": "contact_hours_weekday",
+      "label": "Horario entre semana",
+      "default": "Lunes a Viernes 10:00 am a 07:00 pm"
+    },
+    {
+      "type": "text",
+      "id": "contact_hours_saturday",
+      "label": "Horario sábado",
+      "default": "Sábados 10:00 am a 04:00 pm"
+    },
+    {
+      "type": "header",
+      "content": "Footer Inferior"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_links",
+      "label": "Mostrar enlaces inferiores",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "copyright_text",
+      "label": "Texto de copyright",
+      "default": "Propiedad artística © 2025 MUNDO IN. &nbsp;|&nbsp; Tecnología de Shopify"
+    },
+    {
+      "type": "header",
+      "content": "Íconos de Métodos de Pago"
+    },
+    {
+      "type": "paragraph",
+      "content": "Se muestran automáticamente los métodos de pago activados en tu tienda (Configuración → Pagos)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "social_link",
+      "name": "Red Social",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Facebook"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "html",
+          "id": "icon",
+          "label": "SVG del ícono",
+          "info": "Pega el código SVG completo aquí"
+        }
+      ]
+    },
+    {
+      "type": "navigation_link",
+      "name": "Enlace de Navegación",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Enlace"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    },
+    {
+      "type": "info_link",
+      "name": "Enlace de Información",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Enlace"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "target_blank",
+          "label": "Abrir en nueva pestaña",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "bottom_link",
+      "name": "Enlace Inferior",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Enlace"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Custom"
+    }
+  ]
+}
+{% endschema %}

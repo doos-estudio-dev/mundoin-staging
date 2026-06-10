@@ -1,0 +1,227 @@
+{%- comment -%}
+This file has been modified by the Yoast SEO for Shopify app.
+You can learn more about this (and learn how to cleanly revert these changes) at https://yoa.st/removing-theme-changes.
+{%- endcomment -%}
+{% comment %}
+  Bloque: Breadcrumbs (Migas de Pan)
+
+  Funcionalidad:
+  - Muestra la ruta de navegación: Inicio > Colección > Producto
+  - Optimizado para SEO con Schema.org markup
+  - Diseño limpio y responsive
+{% endcomment %}
+
+<nav class="breadcrumbs" aria-label="Breadcrumb" style="margin: 0 0 1.5rem 0; padding: 0;">
+  <ol
+    {% if disabled_by_yoast_seo %}itemscope{% endif %}
+    {% if disabled_by_yoast_seo %}itemtype="https://schema.org/BreadcrumbList"{% endif %}
+    style="
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+      gap: 0.5rem;
+    "
+  >
+    {%- comment -%} Inicio {%- endcomment -%}
+    <li
+      {% if disabled_by_yoast_seo %}itemprop="itemListElement"{% endif %}
+      {% if disabled_by_yoast_seo %}itemscope{% endif %}
+      {% if disabled_by_yoast_seo %}itemtype="https://schema.org/ListItem"{% endif %}
+      style="display: flex; align-items: center;"
+    >
+      <a
+        href="/"
+        {% if disabled_by_yoast_seo %}itemprop="item"{% endif %}
+        style="
+          color: #666;
+          text-decoration: none;
+          transition: color 0.2s;
+        "
+        onmouseover="this.style.color='#000'"
+        onmouseout="this.style.color='#666'"
+      >
+        <span {% if disabled_by_yoast_seo %}itemprop="name"{% endif %}>Inicio</span>
+      </a>
+      {%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+<meta {% if disabled_by_yoast_seo %}itemprop="position"{% endif %} content="1" />
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+    </li>
+
+    {%- comment -%} Separador {%- endcomment -%}
+    <li style="color: #999; user-select: none;" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: block;">
+        <path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </li>
+
+    {%- comment -%} Colección (si existe) {%- endcomment -%}
+    {%- if collection -%}
+      {%- comment -%} Eliminar texto antes de | si existe {%- endcomment -%}
+      {%- assign breadcrumb_collection_title = collection.title -%}
+      {%- if breadcrumb_collection_title contains '|' -%}
+        {%- assign title_parts = breadcrumb_collection_title | split: '|' -%}
+        {%- assign breadcrumb_collection_title = title_parts[1] | strip -%}
+      {%- endif -%}
+      <li
+        {% if disabled_by_yoast_seo %}itemprop="itemListElement"{% endif %}
+        {% if disabled_by_yoast_seo %}itemscope{% endif %}
+        {% if disabled_by_yoast_seo %}itemtype="https://schema.org/ListItem"{% endif %}
+        style="display: flex; align-items: center;"
+      >
+        <a
+          href="{{ collection.url }}"
+          {% if disabled_by_yoast_seo %}itemprop="item"{% endif %}
+          style="
+            color: #666;
+            text-decoration: none;
+            transition: color 0.2s;
+          "
+          onmouseover="this.style.color='#000'"
+          onmouseout="this.style.color='#666'"
+        >
+          <span {% if disabled_by_yoast_seo %}itemprop="name"{% endif %}>{{ breadcrumb_collection_title }}</span>
+        </a>
+        {%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+{%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+<meta {% if disabled_by_yoast_seo %}itemprop="position"{% endif %} content="2" />
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+      </li>
+
+      {%- comment -%} Separador {%- endcomment -%}
+      <li style="color: #999; user-select: none;" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: block;">
+          <path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </li>
+
+      {%- comment -%} Producto actual {%- endcomment -%}
+      <li
+        {% if disabled_by_yoast_seo %}itemprop="itemListElement"{% endif %}
+        {% if disabled_by_yoast_seo %}itemscope{% endif %}
+        {% if disabled_by_yoast_seo %}itemtype="https://schema.org/ListItem"{% endif %}
+        style="display: flex; align-items: center;"
+      >
+        <span
+          {% if disabled_by_yoast_seo %}itemprop="name"{% endif %}
+          style="
+            color: #000;
+            font-weight: 500;
+          "
+          aria-current="page"
+        >
+          {{ product.title }}
+        </span>
+        {%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+<meta {% if disabled_by_yoast_seo %}itemprop="position"{% endif %} content="3" />
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+        {%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+{%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+<link {% if disabled_by_yoast_seo %}itemprop="item"{% endif %} href="{{ product.url }}" />
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+      </li>
+    {%- else -%}
+      {%- comment -%} Si no hay colección, solo mostrar producto {%- endcomment -%}
+      <li
+        {% if disabled_by_yoast_seo %}itemprop="itemListElement"{% endif %}
+        {% if disabled_by_yoast_seo %}itemscope{% endif %}
+        {% if disabled_by_yoast_seo %}itemtype="https://schema.org/ListItem"{% endif %}
+        style="display: flex; align-items: center;"
+      >
+        <span
+          {% if disabled_by_yoast_seo %}itemprop="name"{% endif %}
+          style="
+            color: #000;
+            font-weight: 500;
+          "
+          aria-current="page"
+        >
+          {{ product.title }}
+        </span>
+        {%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+{%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+<meta {% if disabled_by_yoast_seo %}itemprop="position"{% endif %} content="2" />
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+        {%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+{%- comment -%}Auto-disabled. Yoast plugin is taking care of Meta Tags output.{%- endcomment -%}
+{%- if disabled_by_yoast_seo -%}
+<link {% if disabled_by_yoast_seo %}itemprop="item"{% endif %} href="{{ product.url }}" />
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+{%- comment -%} End Yoast auto-disable. {%- endcomment -%}
+{%- endif -%}
+      </li>
+    {%- endif -%}
+  </ol>
+</nav>
+
+<style>
+  /* Hover effects con CSS para mejor performance */
+  .breadcrumbs a:hover {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .breadcrumbs {
+      margin: 0 0 1rem 0 !important;
+    }
+
+    .breadcrumbs ol {
+      font-size: 13px !important;
+      gap: 0.35rem !important;
+    }
+
+    .breadcrumbs svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    /* Truncar texto largo en móvil */
+    .breadcrumbs span[aria-current="page"] {
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+  }
+
+  /* Accesibilidad: Focus states */
+  .breadcrumbs a:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Breadcrumbs",
+  "tag": "div",
+  "settings": []
+}
+{% endschema %}

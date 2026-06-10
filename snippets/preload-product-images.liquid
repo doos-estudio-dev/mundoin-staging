@@ -1,0 +1,44 @@
+{% comment %}
+  Precarga la primera imagen del producto para mejorar LCP en páginas de producto
+
+  Uso: {% render 'preload-product-images', product: product %}
+{% endcomment %}
+
+{% if template.name == 'product' and product %}
+  {% comment %} Precargar la primera imagen del producto (LCP) {% endcomment %}
+  {% if product.featured_media %}
+    {% if product.selected_or_first_available_variant.featured_media %}
+      {% assign first_image = product.selected_or_first_available_variant.featured_media %}
+    {% else %}
+      {% assign first_image = product.featured_media %}
+    {% endif %}
+
+    {% if first_image.media_type == 'image' %}
+      <link
+        rel="preload"
+        as="image"
+        href="{{ first_image | image_url: width: 1200 }}"
+        imagesrcset="
+          {{ first_image | image_url: width: 240 }} 240w,
+          {{ first_image | image_url: width: 352 }} 352w,
+          {{ first_image | image_url: width: 832 }} 832w,
+          {{ first_image | image_url: width: 1200 }} 1200w,
+          {{ first_image | image_url: width: 1600 }} 1600w,
+          {{ first_image | image_url: width: 1920 }} 1920w"
+        imagesizes="(min-width: 750px) 50vw, 100vw"
+        fetchpriority="high">
+    {% endif %}
+  {% endif %}
+
+  {% comment %} Precargar también la segunda imagen si existe (hover effect) {% endcomment %}
+  {% if product.media.size > 1 %}
+    {% assign second_image = product.media[1] %}
+    {% if second_image.media_type == 'image' %}
+      <link
+        rel="preload"
+        as="image"
+        href="{{ second_image | image_url: width: 1200 }}"
+        fetchpriority="low">
+    {% endif %}
+  {% endif %}
+{% endif %}

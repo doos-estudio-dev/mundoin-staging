@@ -1,0 +1,435 @@
+{%- doc -%}
+  Sistema de filtros personalizados basados en metacampos.
+  Renderizado progresivo con animación.
+{%- enddoc -%}
+
+{%- liquid
+  if in_drawer
+    assign cf_id = 'cf-drawer'
+  else
+    assign cf_id = 'cf-main'
+  endif
+-%}
+
+{%- unless in_drawer -%}
+<style>
+.cf-wrap{width:100%}
+.cf-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cf-clear{background:none;border:none;color:#666;cursor:pointer;font-size:14px;text-decoration:underline;padding:0}
+.cf-clear:hover{color:#000}
+.cf-group{border-bottom:1px solid #e5e5e5;opacity:0;transform:translateY(-10px);animation:cfIn .3s ease forwards}
+@keyframes cfIn{to{opacity:1;transform:translateY(0)}}
+.cf-panel{width:100%}
+.cf-summary{display:flex;align-items:center;gap:8px;padding:12px 0;cursor:pointer;list-style:none}
+.cf-summary::-webkit-details-marker{display:none}
+.cf-label{flex:1;font-weight:500;font-size:14px}
+.cf-icon{transition:transform .2s}
+.cf-panel[open] .cf-icon{transform:rotate(180deg)}
+.cf-content{padding-bottom:12px}
+.cf-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:250px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.cf-cb{display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0;font-size:14px}
+.cf-input{width:16px;height:16px;cursor:pointer;accent-color:#333}
+.cf-text{flex:1;text-transform:capitalize}
+.cf-cnt{color:#999;font-size:12px}
+.cf-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:20px;color:#666}
+.cf-spinner{width:18px;height:18px;border:2px solid #e5e5e5;border-top-color:#333;border-radius:50%;animation:cfspin .8s linear infinite}
+@keyframes cfspin{to{transform:rotate(360deg)}}
+.cf-active{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0;border-bottom:1px solid #e5e5e5}
+.cf-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#f5f5f5;border-radius:16px;font-size:13px}
+.cf-tag button{background:none;border:none;cursor:pointer;padding:0;font-size:16px;line-height:1;color:#666}
+.cf-tag button:hover{color:#000}
+</style>
+{%- endunless -%}
+
+<div class="cf-wrap" id="{{ cf_id }}-wrap" data-handle="{{ collection.handle }}" data-url="{{ collection.url }}" data-total="{{ collection.products_count }}">
+  {%- unless in_drawer -%}
+  <div class="cf-header">
+    <button type="button" class="cf-clear" id="cf-clear" style="display:none">Limpiar todo</button>
+  </div>
+  <div id="cf-active" class="cf-active" style="display:none"></div>
+  {%- endunless -%}
+  <div id="{{ cf_id }}-container">
+    <div class="cf-loading"><div class="cf-spinner"></div><span>Cargando...</span></div>
+  </div>
+</div>
+
+{%- unless in_drawer -%}
+<script>
+(function(){
+  if(window.CF)return;
+  const isPromocionesCollection = window.location.pathname.includes('/collections/promociones');
+  const FC=[
+    ...(isPromocionesCollection ? [['product','type','Tipo']] : []),
+    ['custom','categoria','Categoría'],
+    ['custom','espacio2','Espacio'],
+    ['custom','estilo','Estilo'],
+    ['custom','armado','Armado'],
+    ['custom','brazo','Brazo'],
+    ['custom','material_asiento','Material asiento'],
+    ['custom','forma','Forma'],
+    ['custom','capacidad','Capacidad'],
+    ['custom','cajones','Cajones'],
+    ['custom','plazas','Plazas'],
+    ['custom','altura','Altura'],
+    ['custom','material_cubierta','Material Cubierta'],
+    ['custom','descansabrazos','Descansabrazos'],
+    ['custom','cabecera','Cabecera'],
+    ['custom','cojines','Cojines'],
+    ['custom','soporte_lumbar','Soporte lumbar'],
+    ['custom','materia_superficie','Material superficie'],
+    ['custom','para_cuantas_personas','Capacidad personas'],
+    ['custom','gavetas','Gavetas'],
+    ['custom','para_documentos','Para documentos'],
+    ['custom','movilidad','Movilidad'],
+    ['custom','material_base','Material base'],
+    ['custom','recomendacion_para_pantallas','Tamaño pantalla'],
+    ['shopify','color-pattern','Color'],
+    ['shopify','leg-material','Material pata'],
+    ['shopify','upholstery-material','Material tapicería'],
+    ['shopify','frame-material','Material marco'],
+    ['shopify','furniture-fixture-material','Material mueble'],
+    ['shopify','firmness','Firmeza'],
+    ['shopify','material','Material'],
+    ['shopify','bedding-size','Tamaño cama'],
+    ['shopify','office-cart-features','Características'],
+    ['shopify','mounting-type','Tipo montaje'],
+    ['shopify','shelf-material','Material estante']
+  ],
+  $=s=>document.querySelector(s),
+  $$=s=>document.querySelectorAll(s);
+
+  class CF{
+    constructor(){
+      this.main=$('#cf-main-wrap');
+      this.mainC=$('#cf-main-container');
+      this.drawer=$('#cf-drawer-container');
+      if(!this.main)return;
+      this.h=this.main.dataset.handle;
+      this.url=this.main.dataset.url;
+      this.total=+this.main.dataset.total||0;
+      this.ck=`cf_${this.h}_v12`;
+      this.prods=[];
+      this.vals={};
+      this.cnts={};
+      this.act={};
+      this.rendered=new Set();
+      this.renderQueue=[];
+      this.rendering=false;
+      FC.forEach(([n,k])=>{
+        const f=`${n}.${k}`;
+        this.vals[f]=new Set();
+        this.cnts[f]={};
+        this.act[f]=new Set();
+      });
+      this.init();
+    }
+
+    async init(){
+      this.parseURL();
+      const hasF=this.hasAct();
+      const cache=this.getCache();
+      if(cache){
+        this.prods=cache;
+        this.process();
+        this.calc();
+        this.queueRender();
+      }else{
+        await this.load(hasF);
+      }
+      this.events();
+      if(hasF){this.apply();this.updateTags();}
+    }
+
+    getCache(){
+      try{
+        const d=localStorage.getItem(this.ck);
+        if(!d)return null;
+        const{p,t}=JSON.parse(d);
+        if(Date.now()-t>300000){localStorage.removeItem(this.ck);return null;}
+        return p;
+      }catch(e){return null;}
+    }
+
+    setCache(){
+      try{localStorage.setItem(this.ck,JSON.stringify({p:this.prods.map(p=>({i:p.i,m:p.m,h:p.h})),t:Date.now()}));}catch(e){}
+    }
+
+    async load(hasF){
+      const pages=Math.ceil(this.total/24);
+      const curr=this.extract();
+      if(curr.length){
+        this.prods=curr;
+        this.process();
+        if(!hasF){this.calc();this.queueRender();}
+        if(pages<=1){this.setCache();return;}
+      }
+      if(pages<=1){this.setCache();return;}
+
+      // Cargar todas las páginas en paralelo
+      const fetches=[];
+      for(let i=2;i<=pages;i++)fetches.push(this.fetch(i));
+      const results=await Promise.all(fetches);
+      results.forEach(res=>{if(res.length)this.prods.push(...res);});
+      this.process();
+      if(!hasF){this.calc();this.updateUI();}
+      this.setCache();
+    }
+
+    updateUI(){
+      this.queueRender();
+      document.querySelectorAll('.cf-cb').forEach(l=>{
+        const inp=l.querySelector('.cf-input'),cnt=l.querySelector('.cf-cnt');
+        if(!inp||!cnt)return;
+        cnt.textContent=`(${this.cnts[inp.dataset.fk]?.[inp.value]||0})`;
+      });
+    }
+
+    extract(){
+      const g=$('.collection-wrapper ul[class*="product-grid"]')||$('ul.product-grid');
+      if(!g)return[];
+      const out=[];
+      g.querySelectorAll(':scope > li').forEach(li=>{
+        const c=li.querySelector('product-card');
+        if(!c)return;
+        let m={};
+        try{m=JSON.parse(c.dataset.productMetafields||'{}');}catch(e){}
+        out.push({i:c.dataset.productId,m,h:li.outerHTML});
+      });
+      return out;
+    }
+
+    async fetch(page){
+      try{
+        const r=await fetch(`${this.url}?page=${page}`);
+        if(!r.ok)return[];
+        const doc=new DOMParser().parseFromString(await r.text(),'text/html');
+        const g=doc.querySelector('.collection-wrapper ul[class*="product-grid"]')||doc.querySelector('ul.product-grid');
+        if(!g)return[];
+        const out=[];
+        g.querySelectorAll(':scope > li').forEach(li=>{
+          const c=li.querySelector('product-card');
+          if(!c)return;
+          let m={};
+          try{m=JSON.parse(c.dataset.productMetafields||'{}');}catch(e){}
+          out.push({i:c.dataset.productId,m,h:li.outerHTML});
+        });
+        return out;
+      }catch(e){return[];}
+    }
+
+    process(){
+      this.prods.forEach(p=>{
+        if(!p.m)return;
+        FC.forEach(([n,k])=>{
+          let v=p.m[n]?.[k];
+          // Para product.type, si no hay valor, asignar "Sin tipo"
+          if(n==='product'&&k==='type'&&(!v||v.trim()==='')){
+            v='Sin tipo';
+            if(!p.m.product)p.m.product={};
+            p.m.product.type='Sin tipo';
+          }
+          if(!v)return;
+          const f=`${n}.${k}`;
+          (Array.isArray(v)?v:[v]).forEach(x=>{
+            const s=String(x).trim();
+            if(s&&s!=='undefined'&&s!=='null')this.vals[f].add(s);
+          });
+        });
+      });
+    }
+
+    calc(){
+      FC.forEach(([n,k])=>{this.cnts[`${n}.${k}`]={};});
+      this.prods.forEach(({m})=>{
+        if(!m)return;
+        FC.forEach(([n,k])=>{
+          let v=m[n]?.[k];
+          // Para product.type, contar "Sin tipo" si no hay valor
+          if(n==='product'&&k==='type'&&(!v||v.trim()==='')){
+            v='Sin tipo';
+          }
+          if(!v)return;
+          const f=`${n}.${k}`;
+          (Array.isArray(v)?v:[v]).forEach(x=>{
+            const s=String(x).trim();
+            if(s&&s!=='undefined'&&s!=='null')this.cnts[f][s]=(this.cnts[f][s]||0)+1;
+          });
+        });
+      });
+    }
+
+    parseURL(){
+      const p=new URLSearchParams(location.search);
+      for(const[k,v]of p){
+        const m=k.match(/^cf_(custom|shopify|product)_(.+)$/);
+        if(m&&this.act[`${m[1]}.${m[2]}`])this.act[`${m[1]}.${m[2]}`].add(v);
+      }
+    }
+
+    events(){
+      $('#cf-clear')?.addEventListener('click',()=>this.clear());
+      document.addEventListener('change',e=>{
+        if(!e.target.classList.contains('cf-input'))return;
+        const{fk}=e.target.dataset,{value,checked}=e.target;
+        checked?this.act[fk].add(value):this.act[fk].delete(value);
+        $$('.cf-input[data-fk="'+fk+'"][value="'+value+'"]').forEach(cb=>{cb.checked=checked;});
+        this.apply();
+        this.updateURL();
+        this.updateTags();
+      });
+    }
+
+    apply(){
+      if(!this.hasAct()){location.href=this.url;return;}
+      const g=$('.collection-wrapper ul[class*="product-grid"]');
+      if(!g)return;
+      const match=this.prods.filter(p=>this.matches(p.m));
+      g.innerHTML=match.length?match.map(p=>p.h).join(''):'';
+      this.updateCnts(match);
+      $('#cf-clear').style.display='block';
+      ['.pagination','.load-more','pagination-component','[ref="viewMoreNext"]','[ref="viewMorePrevious"]'].forEach(s=>{$$(s).forEach(el=>el.style.display='none');});
+    }
+
+    updateCnts(visible){
+      const c={};
+      FC.forEach(([n,k])=>{c[`${n}.${k}`]={};});
+      visible.forEach(({m})=>{
+        if(!m)return;
+        FC.forEach(([n,k])=>{
+          let v=m[n]?.[k];
+          // Para product.type, contar "Sin tipo" si no hay valor
+          if(n==='product'&&k==='type'&&(!v||String(v).trim()==='')){
+            v='Sin tipo';
+          }
+          if(!v)return;
+          const f=`${n}.${k}`;
+          (Array.isArray(v)?v:[v]).forEach(x=>{
+            const s=String(x).trim();
+            if(s)c[f][s]=(c[f][s]||0)+1;
+          });
+        });
+      });
+      $$('.cf-cb').forEach(l=>{
+        const inp=l.querySelector('.cf-input'),cnt=l.querySelector('.cf-cnt');
+        if(!inp||!cnt)return;
+        const n=c[inp.dataset.fk]?.[inp.value]||0;
+        cnt.textContent=`(${n})`;
+        const li=l.closest('li');
+        if(li)li.style.display=(n===0&&!inp.checked)?'none':'';
+      });
+      $$('.cf-group').forEach(g=>{
+        g.style.display=[...g.querySelectorAll('.cf-list li')].some(li=>li.style.display!=='none')?'':'none';
+      });
+    }
+
+    matches(m){
+      for(const[f,av]of Object.entries(this.act)){
+        if(!av.size)continue;
+        const[n,k]=f.split('.');
+        let v=m?.[n]?.[k];
+        // Para product.type, usar "Sin tipo" si no hay valor
+        if(n==='product'&&k==='type'&&(!v||String(v).trim()==='')){
+          v='Sin tipo';
+        }
+        if(!v)return false;
+        const vs=(Array.isArray(v)?v:[v]).map(x=>String(x).trim().toLowerCase());
+        if(![...av].some(a=>vs.includes(a.toLowerCase())))return false;
+      }
+      return true;
+    }
+
+    hasAct(){return Object.values(this.act).some(s=>s.size>0);}
+
+    clear(){location.href=this.url;}
+
+    updateURL(){
+      const u=new URL(location.href);
+      [...u.searchParams.keys()].filter(k=>k.startsWith('cf_')).forEach(k=>u.searchParams.delete(k));
+      Object.entries(this.act).forEach(([f,vs])=>{
+        const[n,k]=f.split('.');
+        vs.forEach(v=>u.searchParams.append(`cf_${n}_${k}`,v));
+      });
+      history.replaceState({},'',u);
+    }
+
+    updateTags(){
+      const el=$('#cf-active');
+      if(!el)return;
+      const tags=[];
+      Object.entries(this.act).forEach(([f,vs])=>{
+        if(!vs.size)return;
+        const cfg=FC.find(c=>`${c[0]}.${c[1]}`===f);
+        vs.forEach(v=>{
+          tags.push(`<span class="cf-tag"><span>${cfg?.[2]||f}: ${v.replace(/-/g,' ')}</span><button data-fk="${f}" data-v="${v}">×</button></span>`);
+        });
+      });
+      el.innerHTML=tags.join('');
+      el.style.display=tags.length?'flex':'none';
+      el.querySelectorAll('button').forEach(b=>{
+        b.onclick=()=>{
+          this.act[b.dataset.fk].delete(b.dataset.v);
+          $$('.cf-input[data-fk="'+b.dataset.fk+'"][value="'+b.dataset.v+'"]').forEach(cb=>{cb.checked=false;});
+          this.hasAct()?(this.apply(),this.updateURL(),this.updateTags()):this.clear();
+        };
+      });
+    }
+
+    // Agregar filtros a la cola de renderizado
+    queueRender(){
+      [this.mainC,this.drawer].forEach((container,idx)=>{
+        if(!container)return;
+        container.querySelector('.cf-loading')?.remove();
+
+        FC.forEach(([ns,key,label])=>{
+          const f=`${ns}.${key}`;
+          const rid=`${idx}-${f}`;
+          if(this.rendered.has(rid))return;
+          const vs=[...(this.vals[f]||[])].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+          if(!vs.length)return;
+
+          this.rendered.add(rid);
+          this.renderQueue.push({container,idx,ns,key,label,f,vs});
+        });
+      });
+
+      this.processQueue();
+    }
+
+    // Procesar cola uno por uno con animación
+    processQueue(){
+      if(this.rendering||!this.renderQueue.length)return;
+      this.rendering=true;
+
+      const item=this.renderQueue.shift();
+      this.renderOne(item);
+
+      // Siguiente filtro después de 80ms
+      setTimeout(()=>{
+        this.rendering=false;
+        this.processQueue();
+      },80);
+    }
+
+    // Renderizar un solo filtro
+    renderOne({container,idx,ns,key,label,f,vs}){
+      const n=container.querySelectorAll('.cf-group').length;
+      const actSet=this.act[f];
+      const pre=idx?'d':'m';
+
+      let html=`<div class="cf-group" data-fk="${f}"><details class="cf-panel"${actSet.size||n<3?' open':''}><summary class="cf-summary"><span class="cf-label">${label}</span><span class="cf-icon"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></span></summary><div class="cf-content"><ul class="cf-list">`;
+      vs.forEach(v=>{
+        const id=`f-${pre}-${ns}-${key}-${v.replace(/[^a-z0-9]/gi,'')}`;
+        html+=`<li><label class="cf-cb" for="${id}"><input type="checkbox" class="cf-input" id="${id}" data-fk="${f}" value="${v.replace(/"/g,'&quot;')}"${actSet.has(v)?' checked':''}><span class="cf-text">${v.replace(/-/g,' ')}</span><span class="cf-cnt">(${this.cnts[f][v]||0})</span></label></li>`;
+      });
+      html+='</ul></div></details></div>';
+
+      container.insertAdjacentHTML('beforeend',html);
+    }
+  }
+
+  window.CF=CF;
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>new CF(),{once:true});
+  else setTimeout(()=>new CF(),0);
+})();
+</script>
+{%- endunless -%}

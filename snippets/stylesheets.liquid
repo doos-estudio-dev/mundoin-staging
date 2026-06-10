@@ -1,0 +1,11 @@
+{% comment %} Preload critical stylesheets {% endcomment %}
+{{ 'overflow-list.css' | asset_url | preload_tag: as: 'style' }}
+<link rel="preload" href="{{ 'base.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ 'base.css' | asset_url }}"></noscript>
+
+{% comment %} Defer non-critical CSS {% endcomment %}
+<link rel="preload" href="{{ 'custom-fonts.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ 'custom-fonts.css' | asset_url }}"></noscript>
+
+<link rel="preload" href="{{ 'custom-header.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ 'custom-header.css' | asset_url }}"></noscript>

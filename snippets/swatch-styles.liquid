@@ -1,0 +1,201 @@
+{%- comment -%}
+  Sistema de Swatches con 3 Niveles de Prioridad en Cascada
+{%- endcomment -%}
+
+{%- liquid
+  # ============================================================================
+  # INICIALIZAR VARIABLES
+  # ============================================================================
+  assign swatch_bg_color = null
+  assign swatch_bg_image = null
+  assign swatch_bg_variables = null
+  assign swatch_custom_color = null
+  assign swatch_png_found = false
+
+  # Default values
+  unless swatch_size
+    assign swatch_size = 32
+  endunless
+
+  unless use_aspect_ratio
+    assign use_aspect_ratio = true
+  endunless
+
+  # ============================================================================
+  # NORMALIZAR NOMBRE DEL COLOR
+  # ============================================================================
+  assign swatch_search_color = color_name | downcase | strip
+  assign swatch_file_name = color_name | downcase | handleize | append: '.png'
+
+  # ============================================================================
+  # PRIORIDAD 1: BUSCAR EN CUSTOM COLORS (settings.swatches_custom_colors)
+  # ============================================================================
+  if settings.swatches_custom_colors and settings.swatches_custom_colors != blank
+    # Dividir el textarea en líneas
+    assign custom_colors_lines = settings.swatches_custom_colors | newline_to_br | split: '<br />'
+
+    for color_line in custom_colors_lines
+      # Limpiar la línea
+      assign color_line_clean = color_line | strip
+
+      # Verificar que la línea contenga ':'
+      if color_line_clean contains ':'
+        # Separar por ':'
+        assign color_parts = color_line_clean | split: ':'
+
+        if color_parts.size >= 2
+          assign custom_color_name = color_parts[0] | downcase | strip
+          assign custom_color_value = color_parts[1] | strip
+
+          # Comparar con el color buscado (case-insensitive)
+          if custom_color_name == swatch_search_color
+            assign swatch_custom_color = custom_color_value
+            break
+          endif
+        endif
+      endif
+    endfor
+  endif
+
+  # ============================================================================
+  # PRIORIDAD 2: BUSCAR ARCHIVO PNG EN SHOPIFY FILES
+  # ============================================================================
+  # IMPORTANTE: PNG OVERRIDE - si existe PNG, siempre gana sobre el color HEX
+
+  # OPCIÓN 1: Usar URL base configurada manualmente (más confiable)
+  if settings.swatches_files_url and settings.swatches_files_url != blank
+    # El usuario configuró la URL base manualmente
+    assign swatch_bg_image = settings.swatches_files_url | append: swatch_file_name
+  else
+    # OPCIÓN 2: Auto-detectar la URL base desde los assets
+    assign base_asset_url = 'base.css' | asset_url
+
+    # Extraer el shop ID de la URL del asset
+    # Ejemplo: https://cdn.shopify.com/s/files/1/1233/2374/t/XX/assets/base.css
+    # Queremos extraer: 1/1233/2374
+    assign url_parts = base_asset_url | split: '/files/'
+    if url_parts.size > 1
+      assign shop_path_parts = url_parts[1] | split: '/t/'
+      if shop_path_parts.size > 0
+        assign shop_id_path = shop_path_parts[0]
+        # Ahora tenemos algo como "1/1233/2374"
+        # Construir la URL completa del archivo PNG
+        capture swatch_files_url
+          echo 'https://cdn.shopify.com/s/files/'
+          echo shop_id_path
+          echo '/files/'
+          echo swatch_file_name
+        endcapture
+        assign swatch_bg_image = swatch_files_url | strip
+      endif
+    endif
+  endif
+
+  # ============================================================================
+  # PRIORIDAD 3: FALLBACK A COLOR HTML NATIVO
+  # ============================================================================
+  # Establecer color de fondo como fallback
+  # Si existe PNG, se mostrará encima; si no existe, se mostrará este color
+  if swatch_custom_color == null
+    # Mapear nombres de colores comunes a códigos CSS válidos
+    assign color_normalized = color_name | downcase | strip
+
+    case color_normalized
+      when 'negro', 'black'
+        assign swatch_bg_color = '#000000'
+      when 'blanco', 'white'
+        assign swatch_bg_color = '#FFFFFF'
+      when 'gris', 'gray', 'grey'
+        assign swatch_bg_color = '#808080'
+      when 'rojo', 'red'
+        assign swatch_bg_color = '#FF0000'
+      when 'azul', 'blue'
+        assign swatch_bg_color = '#0000FF'
+      when 'verde', 'green'
+        assign swatch_bg_color = '#008000'
+      when 'amarillo', 'yellow'
+        assign swatch_bg_color = '#FFFF00'
+      when 'naranja', 'orange'
+        assign swatch_bg_color = '#FFA500'
+      when 'rosa', 'pink'
+        assign swatch_bg_color = '#FFC0CB'
+      when 'morado', 'purple'
+        assign swatch_bg_color = '#800080'
+      when 'marrón', 'marron', 'brown'
+        assign swatch_bg_color = '#8B4513'
+      when 'beige'
+        assign swatch_bg_color = '#F5F5DC'
+      when 'crema', 'cream'
+        assign swatch_bg_color = '#FFFDD0'
+      when 'mostaza', 'mustard'
+        assign swatch_bg_color = '#FFDB58'
+      when 'tabaco', 'tobacco'
+        assign swatch_bg_color = '#8B6B47'
+      when 'aceituna', 'olive', 'olive green'
+        assign swatch_bg_color = '#6B8E23'
+      when 'navy', 'azul marino'
+        assign swatch_bg_color = '#000080'
+      when 'turquesa', 'turquoise'
+        assign swatch_bg_color = '#40E0D0'
+      else
+        # Intentar usar el nombre directamente (funciona con colores CSS nativos)
+        assign swatch_bg_color = color_normalized
+    endcase
+  endif
+
+  # ============================================================================
+  # USAR IMÁGENES DE VARIANTES (OPCIONAL)
+  # ============================================================================
+  if use_variant_images and swatch_product and swatch_option_key
+    # Buscar la variante que corresponde a este color
+    for variant in swatch_product.variants
+      if variant[swatch_option_key] == color_name
+        if variant.featured_media
+          assign variant_image_width = swatch_size | times: 2
+          assign variant_image_url = variant.featured_media | image_url: width: variant_image_width
+
+          # La imagen de variante tiene máxima prioridad
+          assign swatch_bg_image = variant_image_url
+          break
+        endif
+      endif
+    endfor
+  endif
+
+  # ============================================================================
+  # GENERAR OUTPUT CSS COMPATIBLE CON EL SISTEMA EXISTENTE
+  # ============================================================================
+  # El tema usa --swatch-background como CSS variable
+  # Formato esperado: url(...) para imágenes o #HEX para colores
+-%}
+{%- liquid
+  # ============================================================================
+  # GENERAR OUTPUT COMPATIBLE CON --swatch-background
+  # ============================================================================
+  # El tema espera: --swatch-background: url(...) o rgb(...) o #HEX
+  # ESTRATEGIA: Si hay PNG, usar "url(...) fallback-color" para que el color
+  # se muestre si la imagen falla al cargar
+
+  assign swatch_background_value = null
+  assign fallback_color = null
+
+  # Determinar color de fallback primero
+  if swatch_custom_color and swatch_custom_color != blank
+    assign fallback_color = swatch_custom_color
+  elsif swatch_bg_color and swatch_bg_color != blank
+    assign fallback_color = swatch_bg_color
+  else
+    assign fallback_color = '#cccccc'
+  endif
+
+  # PRIORIDAD 1: Si hay imagen PNG, usar url() + fallback color
+  if swatch_bg_image and swatch_bg_image != blank
+    # Usar sintaxis: url(...) fallback-color
+    # El navegador intentará cargar la imagen, y si falla, usará el color
+    assign swatch_background_value = 'url(' | append: swatch_bg_image | append: ') ' | append: fallback_color
+  else
+    # PRIORIDAD 2: Solo color (sin PNG)
+    assign swatch_background_value = fallback_color
+  endif
+-%}
+--swatch-background: {{ swatch_background_value }};

@@ -1,0 +1,26 @@
+/* Ocultar flechas de carrusel en product cards */
+.card-gallery slideshow-arrows {
+  display: none;
+}
+
+/* Estilo para botones de "Ver más" en secciones de colección */
+a.size-style.link {
+  display: block;
+  width: auto;
+  padding: 10px 20px;
+  margin-top: auto;
+  background-color: #145b5d;
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+a.size-style.link:hover {
+  background-color: #0f4849;
+  transform: translateY(-2px);
+  color: #ffffff;
+}

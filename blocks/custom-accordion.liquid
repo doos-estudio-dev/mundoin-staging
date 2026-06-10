@@ -1,0 +1,232 @@
+{% comment %}
+  Bloque: Acordeón Genérico Configurable
+
+  Funcionalidad:
+  - Acordeón desplegable con título y contenido personalizables
+  - Se puede usar múltiples veces en la misma página
+  - Estilo consistente con otros acordeones del tema
+{% endcomment %}
+
+{% if block.settings.title != blank %}
+  <div class="generic-accordion-wrapper" style="margin: 0; width: 100%;">
+    <button
+      class="accordion-header-generic"
+      onclick="toggleAccordion{{ block.id | replace: '-', '_' }}()"
+      aria-expanded="false"
+      aria-controls="accordion-content-{{ block.id }}"
+      style="
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        background: transparent;
+        border: none;
+        border-top: 1px solid #e0e0e0;
+        cursor: pointer;
+        text-align: left;
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+        transition: color 0.2s;
+      "
+      onmouseover="this.style.color='#666'"
+      onmouseout="this.style.color='#000'"
+    >
+      <span>{{ block.settings.title }}</span>
+      <svg
+        id="accordion-icon-{{ block.id }}"
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        style="transition: transform 0.3s ease; flex-shrink: 0; margin-left: 10px;"
+      >
+        <path
+          d="M5 7.5L10 12.5L15 7.5"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
+    <div
+      id="accordion-content-{{ block.id }}"
+      style="
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        width: 100%;
+      "
+    >
+      <div class="accordion-content-inner" style="padding: 0 0 1rem 0; width: 100%;">
+        {% if block.settings.content_type == 'richtext' %}
+          <div class="rte">
+            {{ block.settings.richtext_content }}
+          </div>
+        {% elsif block.settings.content_type == 'html' %}
+          {{ block.settings.html_content }}
+        {% else %}
+          <div style="font-size: 14px; line-height: 1.6; color: #333;">
+            {{ block.settings.text_content | newline_to_br }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    let accordion{{ block.id | replace: '-', '_' }}IsOpen = {{ block.settings.open_by_default }};
+
+    window.toggleAccordion{{ block.id | replace: '-', '_' }} = function() {
+      const content = document.getElementById('accordion-content-{{ block.id }}');
+      const icon = document.getElementById('accordion-icon-{{ block.id }}');
+      const button = content.previousElementSibling;
+
+      accordion{{ block.id | replace: '-', '_' }}IsOpen = !accordion{{ block.id | replace: '-', '_' }}IsOpen;
+
+      if (accordion{{ block.id | replace: '-', '_' }}IsOpen) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        icon.style.transform = 'rotate(180deg)';
+        button.setAttribute('aria-expanded', 'true');
+      } else {
+        content.style.maxHeight = '0';
+        icon.style.transform = 'rotate(0deg)';
+        button.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    // Abrir automáticamente si está configurado
+    if ({{ block.settings.open_by_default }}) {
+      setTimeout(() => {
+        toggleAccordion{{ block.id | replace: '-', '_' }}();
+      }, 100);
+    }
+  })();
+  </script>
+
+  <style>
+    .generic-accordion-wrapper,
+    .generic-accordion-wrapper * {
+      box-sizing: border-box !important;
+    }
+
+    .generic-accordion-wrapper {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+    }
+
+    .accordion-header-generic:hover {
+      color: #666 !important;
+    }
+
+    .accordion-header-generic:focus {
+      outline: 2px solid #000;
+      outline-offset: 2px;
+    }
+
+    .rte p {
+      margin-bottom: 1em;
+      line-height: 1.6;
+    }
+
+    .rte p:last-child {
+      margin-bottom: 0;
+    }
+
+    .rte ul, .rte ol {
+      margin-left: 1.5em;
+      margin-bottom: 1em;
+    }
+
+    .rte li {
+      margin-bottom: 0.5em;
+    }
+
+    .rte a {
+      color: #ef7567;
+      text-decoration: underline;
+    }
+
+    .rte a:hover {
+      text-decoration: none;
+    }
+
+    .rte strong {
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .accordion-header-generic {
+        font-size: 15px !important;
+      }
+
+      .accordion-content-inner {
+        font-size: 13px !important;
+      }
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Acordeón",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título del acordeón",
+      "default": "Título"
+    },
+    {
+      "type": "select",
+      "id": "content_type",
+      "label": "Tipo de contenido",
+      "options": [
+        {
+          "value": "text",
+          "label": "Texto simple"
+        },
+        {
+          "value": "richtext",
+          "label": "Texto enriquecido"
+        },
+        {
+          "value": "html",
+          "label": "HTML personalizado"
+        }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "textarea",
+      "id": "text_content",
+      "label": "Contenido (texto simple)",
+      "info": "Visible cuando 'Tipo de contenido' es 'Texto simple'"
+    },
+    {
+      "type": "richtext",
+      "id": "richtext_content",
+      "label": "Contenido (texto enriquecido)",
+      "info": "Visible cuando 'Tipo de contenido' es 'Texto enriquecido'"
+    },
+    {
+      "type": "html",
+      "id": "html_content",
+      "label": "Contenido (HTML)",
+      "info": "Visible cuando 'Tipo de contenido' es 'HTML personalizado'"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Abrir por defecto",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

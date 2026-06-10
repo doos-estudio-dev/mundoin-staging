@@ -1,0 +1,934 @@
+{% comment %} ---- SECCIÓN DEL BANNER CARRUSEL ---- {% endcomment %}
+  <section class="new-banner" id="home-{{ section.id }}">
+    <div class="banner-deskt carousel-wrapper">
+      <div class="element-banner-deskt">
+        {% assign first_desktop_slide = true %}
+        {% for block in section.blocks %}
+          {% if block.type == 'desktop_slide' and block.settings.image != blank %}
+            {% assign alt_d = block.settings.alt_text | default: 'Banner desktop' %}
+            {% assign loading_attr = 'lazy' %}
+            {% assign fetch_attr = 'auto' %}
+            {% if first_desktop_slide %}
+              {% assign loading_attr = 'eager' %}
+              {% assign fetch_attr = 'high' %}
+              {% assign first_desktop_slide = false %}
+            {% endif %}
+            <a class="slide-desktop" href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }}>
+              {{
+                block.settings.image
+                | image_url: width: 2400
+                | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '(max-width: 768px) 1px, 100vw'
+              }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <button type="button" class="carousel-button prev" aria-label="Anterior">&#10094;</button>
+      <button type="button" class="carousel-button next" aria-label="Siguiente">&#10095;</button>
+    </div>
+
+    <div class="bannr-movil carousel-wrapper">
+      <div class="element-banner-movil">
+        {% assign first_mobile_slide = true %}
+        {% for block in section.blocks %}
+          {% if block.type == 'mobile_slide' and block.settings.image_m != blank %}
+            {% assign alt_m = block.settings.alt_text_m | default: 'Banner mobile' %}
+            {% assign loading_attr = 'lazy' %}
+            {% assign fetch_attr = 'auto' %}
+            {% if first_mobile_slide %}
+              {% assign loading_attr = 'eager' %}
+              {% assign fetch_attr = 'high' %}
+              {% assign first_mobile_slide = false %}
+            {% endif %}
+            <a class="slide-mobile" href="{{ block.settings.link_m | default: '#' }}" {{ block.shopify_attributes }}>
+              {{
+                block.settings.image_m
+                | image_url: width: 800
+                | image_tag: alt: alt_m, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '375, 550, 750, 800', sizes: '(min-width: 769px) 1px, 100vw'
+              }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <button type="button" class="carousel-button prev" aria-label="Anterior">&#10094;</button>
+      <button type="button" class="carousel-button next" aria-label="Siguiente">&#10095;</button>
+    </div>
+  </section>
+
+  <script>
+    (function() {
+      const section = document.getElementById('home-{{ section.id }}');
+      if (!section) return;
+
+      const initCarousel = (wrapper) => {
+        if (!wrapper) return;
+
+        const carousel = wrapper.querySelector('.element-banner-deskt, .element-banner-movil');
+        const prevButton = wrapper.querySelector('.carousel-button.prev');
+        const nextButton = wrapper.querySelector('.carousel-button.next');
+
+        if (!carousel || !prevButton || !nextButton) return;
+
+        // Evitar inicialización duplicada
+        if (wrapper.dataset.carouselInitialized) return;
+        wrapper.dataset.carouselInitialized = 'true';
+
+        const slides = carousel.querySelectorAll('a');
+        if (slides.length === 0) return;
+
+        const totalSlides = slides.length;
+        let currentIndex = 0;
+
+        const scrollToSlide = (index) => {
+          const slideWidth = slides[0].clientWidth + (parseFloat(getComputedStyle(carousel).gap) || 0);
+          carousel.scrollTo({ left: slideWidth * index, behavior: 'smooth' });
+        };
+
+        nextButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          currentIndex++;
+          if (currentIndex >= totalSlides) {
+            currentIndex = 0;
+          }
+          scrollToSlide(currentIndex);
+        });
+
+        prevButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          currentIndex--;
+          if (currentIndex < 0) {
+            currentIndex = totalSlides - 1;
+          }
+          scrollToSlide(currentIndex);
+        });
+      };
+
+      // Inicializar ambos carruseles
+      const desktopWrapper = section.querySelector('.banner-deskt');
+      const mobileWrapper = section.querySelector('.bannr-movil');
+
+      initCarousel(desktopWrapper);
+      initCarousel(mobileWrapper);
+    })();
+  </script>
+
+  {% comment %} ---- INICIO DEL CONTENIDO DINÁMICO ---- {% endcomment %}
+  {%- if section.settings.faq_title != blank -%}
+    <div class="page-width">
+      <h2 class="faq-section-title">{{ section.settings.faq_title | escape }}</h2>
+    </div>
+  {%- endif -%}
+
+  {% for block in section.blocks %}
+    {% case block.type %}
+      {% when 'text_content' %}
+        <div class="page-width">
+          <div class="custom-content-wrapper">
+            <div class="text-content-block" {{ block.shopify_attributes }}>
+              {% if block.settings.heading != blank %}
+                {% if block.settings.use_h1 %}
+                  <h1>{{ block.settings.heading | escape }}</h1>
+                {% else %}
+                  <h2>{{ block.settings.heading | escape }}</h2>
+                {% endif %}
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <div class="rte">
+                  {{ block.settings.text }}
+                </div>
+              {% endif %}
+              {% if block.settings.button_label != blank and block.settings.button_link != blank %}
+                <a href="{{ block.settings.button_link }}" class="button">
+                  {{ block.settings.button_label | escape }}
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      {% when 'collection_item' %}
+        {%- assign prev_index = forloop.index0 | minus: 1 -%}
+        {%- assign prev_block = section.blocks[prev_index] -%}
+        {%- if forloop.first or prev_block.type != 'collection_item' -%}
+          <div class="page-width">
+            <div class="collections-grid">
+        {%- endif -%}
+
+        <div class="collection-item" {{ block.shopify_attributes }}>
+          {%- assign collection = block.settings.collection -%}
+          {%- assign image = block.settings.image -%}
+          {%- comment -%} Eliminar texto antes de | si existe {%- endcomment -%}
+          {%- assign display_title = block.settings.title | default: collection.title | default: 'Nombre de la Colección' -%}
+          {%- if display_title contains '|' -%}
+            {%- assign title_parts = display_title | split: '|' -%}
+            {%- assign display_title = title_parts[1] | strip -%}
+          {%- endif -%}
+          <a href="{{ collection.url | default: '#' }}" target="" rel="noopener" class="collection-link">
+            <h3 class="collection-item-title">{{ display_title }}</h3>
+            <div class="collection-image-wrapper">
+              {% if image != blank %}
+                {{ image | image_url: width: 500 | image_tag: alt: image.alt, loading: 'lazy', sizes: '(max-width: 768px) 50vw, 25vw' }}
+              {% elsif collection.image != blank %}
+                {{ collection.image | image_url: width: 500 | image_tag: alt: collection.title, loading: 'lazy', sizes: '(max-width: 768px) 50vw, 25vw' }}
+              {% else %}
+                {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </div>
+          </a>
+        </div>
+
+        {%- assign next_block = section.blocks[forloop.index] -%}
+        {%- if forloop.last or next_block.type != 'collection_item' -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+      {% when 'circular_collection_item' %}
+        {%- assign prev_index = forloop.index0 | minus: 1 -%}
+        {%- assign prev_block = section.blocks[prev_index] -%}
+        {%- if forloop.first or prev_block.type != 'circular_collection_item' -%}
+          <div class="page-width">
+            <div class="circular-collections-grid">
+        {%- endif -%}
+
+        <div class="circular-collection-item" {{ block.shopify_attributes }}>
+          {%- assign collection = block.settings.collection -%}
+          {%- assign image = block.settings.image -%}
+
+          {%- comment -%} Calcular el menor precio de la colección (optimizado) {%- endcomment -%}
+          {%- assign min_price = 999999999 -%}
+          {%- if collection != blank -%}
+            {%- for product in collection.products limit: 10 -%}
+              {%- if product.available and product.price < min_price -%}
+                {%- assign min_price = product.price -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+
+          {%- comment -%} Eliminar texto antes de | si existe {%- endcomment -%}
+          {%- assign circular_display_title = block.settings.title | default: collection.title | default: 'Nombre' -%}
+          {%- if circular_display_title contains '|' -%}
+            {%- assign title_parts = circular_display_title | split: '|' -%}
+            {%- assign circular_display_title = title_parts[1] | strip -%}
+          {%- endif -%}
+
+          <a href="{{ collection.url | default: '#' }}" target="" rel="noopener" class="collection-link">
+            <div class="circular-collection-image-wrapper">
+              {% if image != blank %}
+                {{ image | image_url: width: 400 | image_tag: alt: image.alt, loading: 'lazy', sizes: '(max-width: 768px) 50vw, 20vw' }}
+              {% elsif collection.image != blank %}
+                {{ collection.image | image_url: width: 400 | image_tag: alt: collection.title, loading: 'lazy', sizes: '(max-width: 768px) 50vw, 20vw' }}
+              {% else %}
+                {{ 'collection-2' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </div>
+            <h3 class="circular-collection-item-title">{{ circular_display_title }}</h3>
+
+            {%- if block.settings.subtitle != blank -%}
+              <p class="circular-collection-item-subtitle">{{ block.settings.subtitle }}</p>
+            {%- endif -%}
+
+            {%- if block.settings.description != blank -%}
+              <p class="circular-collection-item-description">{{ block.settings.description }}</p>
+            {%- endif -%}
+
+            {%- if collection != blank and min_price < 999999999 -%}
+              <p class="circular-collection-item-price">Desde <span style="color:red; font-size:20px">{{ min_price | money }}</span></p>
+            {%- endif -%}
+          </a>
+        </div>
+
+        {%- assign next_block = section.blocks[forloop.index] -%}
+        {%- if forloop.last or next_block.type != 'circular_collection_item' -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+      {% when 'faq_item' %}
+        {%- assign prev_index = forloop.index0 | minus: 1 -%}
+        {%- assign prev_block = section.blocks[prev_index] -%}
+        {%- if forloop.first or prev_block.type != 'faq_item' -%}
+          <div class="page-width">
+            <div class="faq-wrapper">
+        {%- endif -%}
+
+        <div class="faq-item" {{ block.shopify_attributes }}>
+          <h3>
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-question-text">{{ block.settings.question | escape }}</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+          </h3>
+          <div class="faq-answer" hidden>
+            <div class="rte">
+              {{ block.settings.answer }}
+            </div>
+          </div>
+        </div>
+
+        {%- assign next_block = section.blocks[forloop.index] -%}
+        {%- if forloop.last or next_block.type != 'faq_item' -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+      {% when 'multicolumn' %}
+        {% render 'multicolumna', settings: block.settings %}
+
+    {% endcase %}
+  {% endfor %}
+  {% comment %} ---- FIN DEL CONTENIDO DINÁMICO ---- {% endcomment %}
+
+{% schema %}
+{
+  "name": "Home",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "desktop_slide",
+      "name": "Desktop slide",
+      "limit": 12,
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Imagen (desktop)" },
+        { "type": "text", "id": "alt_text", "label": "Texto ALT", "default": "Banner desktop" },
+        { "type": "url", "id": "link", "label": "Enlace (opcional)" }
+      ]
+    },
+    {
+      "type": "mobile_slide",
+      "name": "Mobile slide",
+      "limit": 12,
+      "settings": [
+        { "type": "image_picker", "id": "image_m", "label": "Imagen (mobile)" },
+        { "type": "text", "id": "alt_text_m", "label": "Texto ALT", "default": "Banner mobile" },
+        { "type": "url", "id": "link_m", "label": "Enlace (opcional)" }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Título de Sección",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Título de la Sección"
+        }
+      ]
+    },
+    {
+      "type": "text_content",
+      "name": "Contenido de Texto",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Habla sobre tu marca"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_h1",
+          "label": "Usar H1 en lugar de H2",
+          "default": false,
+          "info": "Activa esta opción para que el título sea un H1 (importante para SEO)"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Usa este texto para compartir información sobre tu marca con tus clientes.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Etiqueta del botón",
+          "default": "Botón"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Enlace del botón"
+        }
+      ]
+    },
+    {
+      "type": "collection_item",
+      "name": "Colección Cuadrada",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Seleccionar Colección"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen Personalizada (Opcional)",
+          "info": "Si no se selecciona ninguna, se usará la imagen de la colección."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Texto del Título",
+          "info": "Si se deja en blanco, se usará el nombre de la colección."
+        }
+      ]
+    },
+    {
+      "type": "circular_collection_item",
+      "name": "Colección Circular",
+      "limit": 10,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Seleccionar Colección"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen Personalizada (Opcional)",
+          "info": "Si no se selecciona ninguna, se usará la imagen de la colección."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Texto del Título",
+          "info": "Si se deja en blanco, se usará el nombre de la colección."
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtítulo"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Descripción"
+        }
+      ]
+    },
+    {
+      "type": "faq_item",
+      "name": "Pregunta Frecuente",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Pregunta",
+          "default": "¿Cuál es la pregunta?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Respuesta",
+          "default": "<p>Añade la respuesta a la pregunta aquí.</p>"
+        }
+      ]
+    },
+    {
+      "type": "multicolumn",
+      "name": "Multicolumna",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Configuración General"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título principal"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subtítulo"
+        },
+        {
+          "type": "header",
+          "content": "Columna 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "col1_icon",
+          "label": "Icono 1"
+        },
+        {
+          "type": "text",
+          "id": "col1_title",
+          "label": "Título 1",
+          "default": "Envío Gratis"
+        },
+        {
+          "type": "richtext",
+          "id": "col1_text",
+          "label": "Texto 1",
+          "default": "<p>En compras mayores a $500</p>"
+        },
+        {
+          "type": "header",
+          "content": "Columna 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "col2_icon",
+          "label": "Icono 2"
+        },
+        {
+          "type": "text",
+          "id": "col2_title",
+          "label": "Título 2",
+          "default": "Pago Seguro"
+        },
+        {
+          "type": "richtext",
+          "id": "col2_text",
+          "label": "Texto 2",
+          "default": "<p>Protegemos tu información</p>"
+        },
+        {
+          "type": "header",
+          "content": "Columna 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "col3_icon",
+          "label": "Icono 3"
+        },
+        {
+          "type": "text",
+          "id": "col3_title",
+          "label": "Título 3",
+          "default": "Soporte 24/7"
+        },
+        {
+          "type": "richtext",
+          "id": "col3_text",
+          "label": "Texto 3",
+          "default": "<p>Estamos para ayudarte</p>"
+        },
+        {
+          "type": "header",
+          "content": "Columna 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "col4_icon",
+          "label": "Icono 4"
+        },
+        {
+          "type": "text",
+          "id": "col4_title",
+          "label": "Título 4",
+          "default": "Garantía"
+        },
+        {
+          "type": "richtext",
+          "id": "col4_text",
+          "label": "Texto 4",
+          "default": "<p>Productos garantizados</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home",
+      "category": "Contenido",
+      "blocks": [
+        { "type": "desktop_slide" },
+        { "type": "mobile_slide" },
+        { "type": "heading" },
+        { "type": "text_content" },
+        { "type": "collection_item" },
+        { "type": "circular_collection_item" },
+        { "type": "multicolumn" },
+        { "type": "faq_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+  .new-banner {
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .new-banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .new-banner .element-banner-deskt,
+  .new-banner .element-banner-movil {
+    display: flex;
+    gap: 0.5rem;
+    overflow: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .new-banner .element-banner-deskt::-webkit-scrollbar,
+  .new-banner .element-banner-movil::-webkit-scrollbar {
+    display: none;
+  }
+  .new-banner .slide-desktop,
+  .new-banner .slide-mobile {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    text-decoration: none;
+  }
+  .carousel-wrapper {
+    position: relative;
+  }
+  .carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #333;
+    transition: background-color 0.2s ease;
+  }
+  .carousel-button:hover {
+    background-color: white;
+  }
+  .carousel-button.prev {
+    left: 1rem;
+  }
+  .carousel-button.next {
+    right: 1rem;
+  }
+
+  /* --- Estilos para la nueva sección de contenido --- */
+  .page-width {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .custom-content-wrapper {
+    padding: 20px 0;
+  }
+  .text-content-block {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .text-content-block h1,
+  .text-content-block h2 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+  }
+  .text-content-block .rte {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 0 auto 25px auto;
+    max-width: 1200px;
+  }
+  .text-content-block .button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #1c1c1c;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: opacity 0.2s ease;
+  }
+  .text-content-block .button:hover {
+    opacity: 0.8;
+  }
+  h1,
+  h2 {
+    color: #184e56 !important;
+    font-family: Mentor Sans, sans-serif;
+  }
+  p {
+    font-family: Montserrat, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: var(--font-size-body);
+  }
+  .section-title {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+
+  /* --- Estilos para Colecciones Cuadradas --- */
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 40px 0;
+    text-align: center;
+  }
+  .collection-item {
+    text-align: center;
+  }
+  .collection-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .collection-image-wrapper {
+    overflow: hidden;
+    border-radius: 8px;
+    position: relative;
+    aspect-ratio: 1 / 1;
+  }
+  .collection-image-wrapper img,
+  .collection-image-wrapper .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+  }
+  .collection-link:hover .collection-image-wrapper img {
+    transform: scale(1.05);
+  }
+  .collection-item-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    font-family: Mentor Sans, sans-serif;
+    color: #333;
+  }
+
+  /* --- Estilos para Colecciones Circulares --- */
+  .circular-collections-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 40px 0;
+    text-align: center;
+  }
+  .circular-collection-item {
+    text-align: center;
+  }
+  .circular-collection-image-wrapper {
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+  }
+  .circular-collection-image-wrapper img,
+  .circular-collection-image-wrapper .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+  }
+  .collection-link:hover .circular-collection-image-wrapper img {
+    transform: scale(1.1);
+  }
+  .circular-collection-item-title {
+    margin-top: 15px;
+    font-size: 1.2em;
+    font-family: Mentor Sans, sans-serif;
+    color: #0f5259;
+    font-weight: 700;
+  }
+
+  .circular-collection-item-subtitle {
+    margin: 8px 0 0;
+    font-size: 0.95em;
+    color: #5f6167;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .circular-collection-item-description {
+    margin: 6px 0 0;
+    font-size: 0.85em;
+    color: #5f6167;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .circular-collection-item-price {
+    margin: 8px 0 0;
+    font-size: 0.9em;
+    color: #0f5259;
+    font-weight: 600;
+  }
+
+  /* --- Estilos para Preguntas Frecuentes (FAQ) --- */
+  .faq-wrapper {
+    margin: 0 auto 40px auto;
+    display: grid;
+    gap: 1rem;
+  }
+  .faq-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    transition: box-shadow 0.2s ease;
+  }
+  .faq-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .faq-item h3 {
+    margin: 0;
+    font-size: 1em;
+  }
+  .faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    background-color: #184e56;
+    color: #fff;
+    border: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-size: 1em;
+    font-family: 'Mentor Sans', sans-serif;
+    font-weight: 600;
+  }
+  .faq-question-text {
+    padding-right: 15px;
+    font-family: Montserrat, sans-serif;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .faq-icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease-in-out;
+  }
+  .faq-icon::before {
+    content: '';
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease-in-out;
+  }
+  .faq-question[aria-expanded='true'] .faq-icon {
+    transform: rotate(180deg);
+  }
+  .faq-answer {
+    overflow: hidden;
+    transition: max-height 0.35s ease-in-out;
+    max-height: 0;
+  }
+  .faq-answer .rte {
+    padding: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    text-align: left;
+    color: #333;
+  }
+  .faq-answer .rte p {
+    margin-top: 0;
+  }
+
+  /* --- Estilos Responsivos --- */
+  @media (max-width: 990px) {
+    .collections-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .circular-collections-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 768px) {
+    .circular-collections-grid {
+      gap: 30px 15px;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .collections-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .banner-deskt {
+      display: none;
+    }
+    .bannr-movil {
+      display: block;
+    }
+  }
+  @media (min-width: 769px) {
+    .bannr-movil {
+      display: none;
+    }
+    .banner-deskt {
+      display: block;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  // FAQ Accordion
+  (function() {
+    const initFaq = () => {
+      const faqQuestions = document.querySelectorAll('.faq-question');
+      faqQuestions.forEach((button) => {
+        if (button.dataset.initialized) return;
+        button.dataset.initialized = 'true';
+
+        button.addEventListener('click', () => {
+          const isExpanded = button.getAttribute('aria-expanded') === 'true';
+          const answer = button.parentElement.nextElementSibling;
+
+          // Cierra todos los demás acordeones abiertos
+          if (!isExpanded) {
+            faqQuestions.forEach((otherButton) => {
+              if (otherButton !== button && otherButton.getAttribute('aria-expanded') === 'true') {
+                otherButton.setAttribute('aria-expanded', 'false');
+                const otherAnswer = otherButton.parentElement.nextElementSibling;
+                otherAnswer.hidden = true;
+                otherAnswer.style.maxHeight = '0px';
+              }
+            });
+          }
+
+          // Abre o cierra el actual
+          button.setAttribute('aria-expanded', !isExpanded);
+          answer.hidden = isExpanded;
+
+          if (!isExpanded) {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+          } else {
+            answer.style.maxHeight = '0px';
+          }
+        });
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFaq);
+    } else {
+      initFaq();
+    }
+  })();
+{% endjavascript %}

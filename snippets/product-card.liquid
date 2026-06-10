@@ -1,0 +1,225 @@
+{%- doc -%}
+  @param {object} product - The product object
+  @param {object} children - The children of the product card
+{%- enddoc -%}
+
+{% assign block_settings = block.settings %}
+
+{% liquid
+  assign product_card_id = 'product-card-' | append: block.id | append: '-' | append: product.id
+  assign product_card_gap_value = product_card_gap | default: block_settings.product_card_gap
+  assign variant_to_link = product.selected_or_first_available_variant
+  assign product_link_url = product.url | append: '?variant=' | append: variant_to_link.id
+%}
+
+<product-card
+  class="product-card"
+  data-product-id="{{ product.id }}"
+  id="{{ product_card_id }}"
+  {%- comment -%} Add URL here for the script to find {%- endcomment -%}
+  data-product-url="{{ product_link_url }}"
+  {{ block.shopify_attributes }}
+  {% render 'product-metafields-data', product: product %}
+>
+  <div
+    class="product-card__content layout-panel-flex layout-panel-flex--column product-grid__card spacing-style border-style gap-style"
+    style="
+      {% render 'border-override', settings: block_settings %}
+      {% render 'layout-panel-style', settings: block_settings %}
+      {% render 'spacing-style', settings: block_settings %}
+      {% render 'gap-style', value: product_card_gap_value, name: 'product-card-gap' %}
+      cursor: pointer; /* Indicates clickability */
+    "
+  >
+    
+    {%- comment -%} --- CUSTOM BADGE OVERLAY --- {%- endcomment -%}
+    {%- if product.metafields.custom.badge_label != blank -%}
+      <div class="custom-badge-overlay">
+        <img src="{{ product.metafields.custom.badge_label | image_url: width: 100 }}" alt="Badge" loading="lazy">
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} 
+      The children (Image/Slider) remain untouched. 
+      Since we removed the overlay, hovers/swipes will work again.
+    {%- endcomment -%}
+    {{ children }}
+
+    {%- if product -%}
+      {%- comment -%} Color Swatches {%- endcomment -%}
+      {%- unless children contains 'product-swatches' or children contains 'swatches-variant-picker-component' -%}
+        <div class="product-card-swatches-wrapper">
+          {% render 'product-card-color-swatches', product: product %}
+        </div>
+      {%- endunless -%}
+
+      {%- comment -%} ACTION BUTTONS ROW {%- endcomment -%}
+      <div class="product-card-actions">
+        <a href="{{ product.url }}" class="product-card-btn btn-secondary">
+          Ver detalles
+        </a>
+        
+        {%- if product.available -%}
+          <div class="product-card-atc-wrapper">
+            {%- form 'product', product, id: product_card_id, class: 'form ajax-cart-form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+              <input type="hidden" name="id" value="{{ variant_to_link.id }}">
+              <button 
+                type="submit" 
+                name="add"
+                class="product-card-btn btn-primary"
+                aria-haspopup="dialog"
+              >
+                <span>Añadir</span>
+                <span class="btn-loader hidden">
+                   <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle></svg>
+                </span>
+              </button>
+            {%- endform -%}
+          </div>
+        {%- else -%}
+          <button class="product-card-btn btn-disabled" disabled>
+            Agotado
+          </button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} JAVASCRIPT: Handle Clicks & Swatches {%- endcomment -%}
+  <script>
+    (function() {
+      const card = document.getElementById('{{ product_card_id }}');
+      if (!card) return;
+
+      // 1. Swatch Logic
+      card.addEventListener('change', (e) => {
+        const variantId = e.target.value;
+        const hiddenInput = card.querySelector('input[name="id"]');
+        if (hiddenInput && variantId && e.target.name === 'id') {
+           hiddenInput.value = variantId;
+        }
+      });
+
+      // 2. Click Navigation Logic (The Architect Fix)
+      card.addEventListener('click', (e) => {
+        // Identify what was clicked
+        const target = e.target;
+        
+        // If user clicked a Button, Link, Form, Swatch, or Swatch Input -> Do NOT navigate
+        const isInteractive = target.closest('button') || 
+                              target.closest('a') || 
+                              target.closest('.product-card-color-swatches') ||
+                              target.closest('label') || // Swatch labels
+                              target.closest('input');   // Swatch inputs
+
+        if (!isInteractive) {
+           // If they clicked the Image or white space, go to product
+           const url = card.getAttribute('data-product-url');
+           if (url) window.location.href = url;
+        }
+      });
+    })();
+  </script>
+</product-card>
+
+{% stylesheet %}
+  /* Container & Grid Setup */
+  .product-card__content {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    padding: 12px !important;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    /* Removed 'position: relative' to avoid messing with Badge positioning context if not needed */
+  }
+
+  /* Interactive Elements */
+  .product-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    width: 100%;
+    padding-top: 12px;
+    z-index: 2; /* Ensure buttons stay clickable */
+    position: relative;
+  }
+
+  .product-card-swatches-wrapper {
+    z-index: 2;
+    position: relative;
+  }
+
+  .product-card-atc-wrapper {
+    flex: 1;
+    display: flex;
+  }
+
+  .ajax-cart-form {
+    width: 100%;
+    margin: 0;
+    display: flex;
+  }
+
+  /* Button Base Styles */
+  .product-card-btn {
+    flex: 1;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    white-space: nowrap;
+    padding: 0 10px;
+  }
+
+  .btn-primary {
+    background-color: #145b5d;
+    color: #ffffff;
+    width: 100%;
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: #145b5d;
+    border: 1.5px solid #145b5d;
+  }
+
+  .btn-disabled {
+    background-color: #f0f0f0;
+    color: #a0a0a0;
+    cursor: not-allowed;
+  }
+
+  /* Loader Styles */
+  .btn-loader.hidden { display: none; }
+  .spinner {
+    width: 18px;
+    height: 18px;
+    animation: rotate 2s linear infinite;
+  }
+  @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+  /* Badge Positioning */
+  .custom-badge-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .custom-badge-overlay img { width: 50px; height: auto; }
+
+  @media screen and (max-width: 480px) {
+    .product-card-actions { gap: 4px; }
+    .product-card-btn { font-size: 11px; height: 38px; padding: 0 4px; }
+  }
+{% endstylesheet %}

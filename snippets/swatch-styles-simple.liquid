@@ -1,0 +1,17 @@
+{%- comment -%}
+  TEST SIMPLIFICADO - Solo para Tabaco
+{%- endcomment -%}
+
+{%- liquid
+  assign test_name = color_name | downcase | strip
+
+  if test_name == 'tabaco'
+    echo '--swatch-background: url(https://cdn.shopify.com/s/files/1/1233/2374/files/tabaco.png);'
+  elsif test_name == 'mostaza'
+    echo '--swatch-background: #FFDB58;'
+  elsif test_name == 'aceituna'
+    echo '--swatch-background: #6B8E23;'
+  else
+    echo '--swatch-background: gray;'
+  endif
+-%}

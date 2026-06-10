@@ -1,0 +1,158 @@
+/* ============================================
+   ESTILOS PERSONALIZADOS DEL HEADER
+   ============================================ */
+
+/* Header altura personalizada - 80px */
+body:has(> #header-group > header) {
+  --header-height: 80px !important;
+}
+
+.header {
+  --header-padding: 20px;
+}
+
+.header.header--compact {
+  --header-padding: 20px;
+}
+
+/* Logo - margen derecho 22px */
+.header-logo {
+  margin-right: 22px;
+}
+
+.header-logo img {
+  max-height: 46px;
+}
+
+/* Barra de búsqueda - estilos personalizados */
+.search-modal__content,
+.search-action input[type="search"],
+search-modal input[type="search"],
+.search-input {
+  border-radius: 21px !important;
+  border: 1px solid #C9D3D4 !important;
+  background-color: #FFFFFF !important;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.search-modal__content {
+  border-radius: 21px !important;
+}
+
+/* Placeholder del buscador */
+.search-input::placeholder,
+input[type="search"]::placeholder {
+  color: #7A8A8C !important;
+}
+
+/* Ícono de búsqueda - Excluir botones de add-to-cart */
+.search-action svg,
+.search-modal svg,
+.search-input svg,
+.search-modal button[type="submit"] svg,
+.search-input button[type="submit"] svg,
+.predictive-search button[type="submit"] svg {
+  color: #145B5D !important;
+  fill: #145B5D !important;
+}
+
+/* SVG de añadir al carrito en BLANCO */
+.quick-add__button svg,
+.add-to-cart-icon svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Background dorado para el botón de añadir al carrito */
+button.button.button.quick-add__button.quick-add__button--add {
+  background: #916B25 !important;
+  color: #ffffff !important;
+}
+
+/* Texto dentro del botón en blanco */
+.quick-add__button .add-to-cart-text__content,
+.quick-add__button .add-to-cart-text,
+.quick-add__button span {
+  color: #ffffff !important;
+}
+
+.search-action .svg-wrapper,
+.search-modal .svg-wrapper {
+  color: #145B5D !important;
+}
+
+/* Íconos del header (usuario, carrito) */
+.header-actions__action svg,
+.header__icon svg {
+  color: #145B5D !important;
+  stroke: #145B5D !important;
+}
+
+.header-actions__action,
+.header__icon {
+  color: #145B5D !important;
+}
+
+/* Espacio entre íconos - 20px */
+.header-actions {
+  gap: 20px;
+}
+
+/* Enlaces de texto (ej: "Sucursales") */
+.header a,
+.header-menu a,
+.menu-list__link {
+  color: #145B5D !important;
+}
+
+.header a:hover,
+.header-menu a:hover,
+.menu-list__link:hover {
+  color: #0f4a4c !important;
+}
+
+/* Borde inferior del header - 1px #E6EAEA */
+.header__row--top {
+  border-bottom: 1px solid #E6EAEA !important;
+}
+
+/* Remover separadores entre secciones */
+.header__columns {
+  gap: 0;
+}
+
+/* Centrar barra de búsqueda */
+.header__column--center {
+  justify-content: center;
+  flex: 1;
+}
+
+.header__column--center .search-action,
+.header__column--center search-modal {
+  width: 100%;
+  max-width: 700px;
+}
+
+/* Announcement Bar - fuente 14px */
+.announcement-bar__text {
+  font-size: 14px !important;
+  text-align: center;
+}
+
+.announcement-bar {
+  text-align: center;
+}
+
+/* Asegurar que los íconos mantengan el color personalizado */
+.header svg path,
+.header svg circle,
+.header svg line {
+  stroke: currentColor;
+}
+
+.search-action svg path,
+.search-action svg circle {
+  stroke: #145B5D !important;
+}

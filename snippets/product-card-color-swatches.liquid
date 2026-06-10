@@ -1,0 +1,213 @@
+{% comment %}
+  Muestra circulitos de colores para las variantes de color en product cards
+  Usa el NUEVO sistema de 3 prioridades en cascada:
+  1. Colores personalizados (settings.swatches_custom_colors)
+  2. Archivos PNG en Shopify Files (OVERRIDE)
+  3. Fallback a color HTML nativo
+
+  @param {object} product - El producto
+
+  Uso: {% render 'product-card-color-swatches', product: product %}
+{% endcomment %}
+
+{%- liquid
+  # Verificar si el sistema de swatches está habilitado
+  unless settings.swatches_enable
+    # Si no está habilitado, salir
+    assign has_colors = false
+  else
+    assign color_option = null
+    assign has_colors = false
+
+    # Buscar la opción que coincida con el trigger configurado
+    assign swatch_trigger = settings.swatches_swatch_trigger | default: 'Color' | downcase | strip
+
+    for option in product.options_with_values
+      assign option_name_downcase = option.name | downcase | strip
+      if option_name_downcase == swatch_trigger or option_name_downcase contains 'color' or option_name_downcase contains 'colour' or option_name_downcase contains 'colore'
+        assign color_option = option
+        assign has_colors = true
+        break
+      endif
+    endfor
+  endunless
+-%}
+
+{% if has_colors and color_option.values.size > 0 %}
+  <div class="product-card-swatches" data-product-id="{{ product.id }}">
+    <div class="product-card-swatches__list">
+      {%- for color_value in color_option.values limit: 5 -%}
+        {%- liquid
+          # Buscar la variante con este color
+          assign color_variant = null
+          for variant in product.variants
+            if variant.option1 == color_value.name or variant.option2 == color_value.name or variant.option3 == color_value.name
+              if variant.available
+                assign color_variant = variant
+                break
+              endif
+            endif
+          endfor
+
+          # Si no hay variante disponible, usar la primera de ese color
+          if color_variant == null
+            for variant in product.variants
+              if variant.option1 == color_value.name or variant.option2 == color_value.name or variant.option3 == color_value.name
+                assign color_variant = variant
+                break
+              endif
+            endfor
+          endif
+
+          # Usar el nuevo sistema de 3 prioridades para obtener estilos
+          assign swatch_card_size = settings.swatches_product_card_size | default: 28
+        -%}
+
+        {% if color_variant %}
+          <div class="product-card-swatch"
+               title="{{ color_value.name }}"
+               data-variant-id="{{ color_variant.id }}"
+               {% if color_variant.featured_media %}
+               data-media-id="{{ color_variant.featured_media.id }}"
+               {% endif %}>
+            {%- liquid
+              # Sistema de colores con PNG + fallback
+              assign color_name_lower = color_value.name | downcase
+              assign color_hex = null
+              assign color_png_url = null
+
+              # Intentar cargar PNG desde Shopify Files
+              if settings.swatches_files_url and settings.swatches_files_url != blank
+                assign color_file_name = color_value.name | downcase | handleize | append: '.png'
+                assign color_png_url = settings.swatches_files_url | append: color_file_name
+              endif
+
+              # Colores hardcoded como fallback
+              case color_name_lower
+                when 'negro', 'black'
+                  assign color_hex = '#000000'
+                when 'blanco', 'white'
+                  assign color_hex = '#FFFFFF'
+                when 'gris', 'gray', 'grey'
+                  assign color_hex = '#808080'
+                when 'rojo', 'red'
+                  assign color_hex = '#FF0000'
+                when 'azul', 'blue'
+                  assign color_hex = '#0000FF'
+                when 'verde', 'green'
+                  assign color_hex = '#008000'
+                when 'amarillo', 'yellow'
+                  assign color_hex = '#FFFF00'
+                when 'naranja', 'orange'
+                  assign color_hex = '#FFA500'
+                when 'mostaza', 'mustard'
+                  assign color_hex = '#FFDB58'
+                when 'tabaco', 'tobacco'
+                  assign color_hex = '#8B6B47'
+                when 'aceituna', 'olive green'
+                  assign color_hex = '#6B8E23'
+              endcase
+            -%}
+
+            {% if color_value.swatch %}
+              {% render 'swatch', swatch: color_value.swatch %}
+            {% elsif color_png_url %}
+              <span class="swatch swatch--unscaled" style="background: url({{ color_png_url }}) {{ color_hex | default: '#cccccc' }}; background-size: cover; background-position: center; width: {{ swatch_card_size }}px; height: {{ swatch_card_size }}px;"></span>
+            {% elsif color_hex %}
+              <span class="swatch swatch--unscaled" style="background: {{ color_hex }}; width: {{ swatch_card_size }}px; height: {{ swatch_card_size }}px;"></span>
+            {% else %}
+              <span class="swatch swatch--unscaled" style="background: {{ color_name_lower }}; width: {{ swatch_card_size }}px; height: {{ swatch_card_size }}px;"></span>
+            {% endif %}
+          </div>
+        {% endif %}
+      {%- endfor -%}
+
+      {%- if color_option.values.size > 5 -%}
+        <div class="product-card-swatch product-card-swatch--more">
+          <span class="swatch-more">+{{ color_option.values.size | minus: 5 }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <style>
+    .product-card-swatches {
+      padding-top: 8px;
+      width: 100%;
+    }
+
+    .product-card-swatches__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .product-card-swatch {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .product-card-swatch:hover {
+      transform: scale(1.15);
+    }
+
+    .product-card-swatch .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      display: block;
+      background: var(--swatch-background);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    @media (min-width: 750px) {
+      .product-card-swatch .swatch {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .product-card-swatch--more .swatch-more {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: rgba(var(--color-foreground-rgb), 0.6);
+      min-width: 28px;
+      height: 28px;
+    }
+
+    @media (min-width: 750px) {
+      .product-card-swatch--more .swatch-more {
+        min-width: 24px;
+        height: 24px;
+        font-size: 10px;
+      }
+    }
+  </style>
+
+  <script>
+    // Hover para cambiar imagen del producto
+    document.querySelectorAll('.product-card-swatch[data-media-id]').forEach(swatch => {
+      const productCard = swatch.closest('.product-card');
+      if (!productCard) return;
+
+      const mediaId = swatch.dataset.mediaId;
+      const productCardImages = productCard.querySelectorAll('img[data-media-id]');
+
+      swatch.addEventListener('mouseenter', () => {
+        productCardImages.forEach(img => {
+          if (img.dataset.mediaId === mediaId) {
+            img.style.display = 'block';
+          } else {
+            img.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+{% endif %}

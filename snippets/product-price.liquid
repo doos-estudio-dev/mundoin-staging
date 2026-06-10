@@ -1,0 +1,9 @@
+{% if product.price_varies %}
+  <span class="product-card-price">
+    Desde {{ product.price_min | money }}
+  </span>
+{% else %}
+  <span class="product-card-price">
+    {{ product.price | money }}
+  </span>
+{% endif %}

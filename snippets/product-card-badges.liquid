@@ -1,0 +1,160 @@
+{%- doc -%}
+  Renders product badges for the product card.
+
+  @param {object} product - The product object.
+  @param {object} settings - The theme settings object.
+
+  @example
+  {% render 'product-card-badges', product: product, settings: settings %}
+{%- enddoc -%}
+
+{%- comment -%} Badge SVG Buen Fin - Esquina superior izquierda 
+{%- if product.metafields.custom.buen_fin == true -%}
+  <div class="product-badge-buen-fin" >
+    <img style="    object-fit: contain !important;" src="https://cdn.shopify.com/s/files/1/1233/2374/files/PROMO_1.svg?v=1765219400" alt="Cyber Monday" loading="lazy">
+  </div>
+{%- endif -%}
+{%- endcomment -%}
+
+{%- comment -%} Badge AGOTADO - Esquina superior derecha {%- endcomment -%}
+{%- if product.available == false -%}
+  <div class="product-badge-sold-out">
+    {{ 'content.product_badge_sold_out' | t }}
+  </div>
+{%- endif -%}
+
+{%- comment -%} Badge de porcentaje de descuento - Esquina inferior izquierda {%- endcomment -%}
+{%- if product.compare_at_price > product.price and product.available -%}
+  {%- assign discount_amount = product.compare_at_price | minus: product.price -%}
+  {%- assign discount_percentage = discount_amount | times: 100.0 | divided_by: product.compare_at_price | round -%}
+  <div class="product-badge-discount">
+    -{{ discount_percentage }}%
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-badges {
+    --badge-inset: max(var(--padding-xs), calc((var(--border-radius) + var(--padding-xs)) * (1 - cos(45deg))));
+
+    position: absolute;
+    z-index: var(--layer-flat);
+  }
+
+  .product-badges--bottom-left {
+    bottom: calc(var(--badge-inset) + var(--padding-block-start));
+    left: calc(var(--badge-inset) + var(--padding-inline-start));
+  }
+
+  .product-badges--top-left {
+    top: calc(var(--badge-inset) + var(--padding-block-start));
+    left: calc(var(--badge-inset) + var(--padding-inline-start));
+  }
+
+  .product-badges--top-right {
+    top: calc(var(--badge-inset) + var(--padding-block-start));
+    right: calc(var(--badge-inset) + var(--padding-inline-start));
+  }
+
+  .product-badges__badge {
+    --badge-font-size: var(--font-size--xs);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #ffffff;
+    background: #145b5d;
+    font-size: var(--badge-font-size);
+    font-family: var(--badge-font-family);
+    font-weight: 600;
+    text-transform: var(--badge-text-transform);
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-badges__badge.color-scheme-4 {
+    background: #dc2626;
+    color: #ffffff;
+  }
+
+  .product-badges__badge--rectangle {
+    padding-block: 6px;
+    padding-inline: 12px;
+  }
+
+  /* Badge SVG Buen Fin - Esquina superior izquierda 
+  .product-badge-buen-fin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+  }
+
+  .product-badge-buen-fin img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .product-badge-buen-fin {
+      width: 30px;
+      height: 30px;
+    }
+  }
+*/
+
+  /* Badge AGOTADO - Esquina superior derecha */
+  .product-badge-sold-out {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #145b5d;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    z-index: 11;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 768px) {
+    .product-badge-sold-out {
+      font-size: 11px;
+      padding: 4px 10px;
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  /* Badge de porcentaje de descuento - Esquina inferior izquierda */
+  .product-badge-discount {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 6px;
+    z-index: 11;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    .product-badge-discount {
+      font-size: 12px;
+      padding: 4px 8px;
+      bottom: 8px;
+      left: 8px;
+    }
+  }
+{% endstylesheet %}

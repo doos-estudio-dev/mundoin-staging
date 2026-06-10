@@ -1,0 +1,300 @@
+<!doctype html>
+<html
+  class="no-js{% if request.design_mode %} shopify-design-mode{% endif %}"
+  lang="{{ request.locale.iso_code }}"
+>
+  <head>{% render 'yoast-seo' %}
+    {%- render 'performance-boost' -%}
+    
+
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+
+    <!-- Google Tag Manager (Async) -->
+    <script>
+      document.addEventListener('StartAsyncLoading', function() {
+        (function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-N2XR55P');
+      });
+    </script>
+    <!-- End Google Tag Manager -->
+
+    {% comment %} View transition support without blocking render - handled by JavaScript {% endcomment %}
+
+    {%- render 'resource-hints' -%}
+    {%- render 'meta-tags' -%}
+    {%- render 'preload-homepage-images' -%}
+    {%- render 'preload-product-images', product: product -%}
+    {%- render 'critical-css' -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'color-schemes' -%}
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+  </head>
+  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
+
+
+    
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-N2XR55P"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+    <div id="header-group">
+      {% section 'header-custom-megamenu' %}
+    </div>
+
+    <script
+      src="{{ 'critical.js' | asset_url }}"
+      type="module"
+      defer
+    ></script>
+
+    <script>
+  document.addEventListener('StartAsyncLoading', function() {
+    var script = document.createElement('script');
+    script.src = 'https://a.klaviyo.com/media/js/onsite/onsite.js';
+    script.async = true;
+    script.onload = function() {
+      var klaviyo = klaviyo || [];
+      klaviyo.init({
+        account: 'TUfFJ5',
+        platform: 'shopify',
+      });
+      klaviyo.enable('backinstock', {
+        trigger: {
+          custom_element: '#klaviyo-custom-trigger'
+        },
+        modal: {
+          header: '{product_name}',
+          body_content: 'Suscríbete y recibe una notificación cuando este artículo vuelva a estar disponible',
+          email_field_label: 'Correo electrónico',
+          button_label: 'Notifícame cuando esté disponible',
+          subscription_success_label: '¡Todo listo! Te avisaremos cuando vuelva a estar disponible',
+          footer_content: '',
+          additional_styles: "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;",
+          drop_background_color: '#000',
+          background_color: '#fff',
+          text_color: '#222',
+          button_text_color: '#fff',
+          button_background_color: '#439fdb',
+          close_button_color: '#ccc',
+          error_background_color: '#fcd6d7',
+          error_text_color: '#C72E2F',
+          success_background_color: '#d3efcd',
+          success_text_color: '#1B9500',
+        },
+      });
+    };
+    document.head.appendChild(script);
+  });
+</script>
+
+    <!-- Klaviyo event ADD TO CART (DONT REMOVE) -->
+    {% if product %}
+      <script>
+        document.addEventListener('StartAsyncLoading', function () {
+          var _learnq = window._learnq || [];
+          function addedToCart() {
+            fetch(`${window.location.origin}/cart.js`).then((res) =>
+              res
+                .clone()
+                .json()
+                .then((data) => {
+                  var cart = {
+                    total_price: data.total_price / 100,
+                    $value: data.total_price / 100,
+                    total_discount: data.total_discount,
+                    original_total_price: data.original_total_price / 100,
+                    items: data.items,
+                  };
+                  if (item !== 'undefined') {
+                    cart = Object.assign(cart, item);
+                  }
+                  if (klAjax) {
+                    _learnq.push(['track', 'Added to Cart', cart]);
+                    klAjax = false;
+                  }
+                })
+            );
+          }
+          (function (ns, fetch) {
+            ns.fetch = function () {
+              const response = fetch.apply(this, arguments);
+              response.then((res) => {
+                if (`${window.location.origin}/cart/add.js`.includes(res.url)) {
+                  addedToCart();
+                }
+              });
+              return response;
+            };
+          })(window, window.fetch);
+          var klAjax = true;
+          var atcButtons = document.querySelectorAll("form[action*='/cart/add'] button[type='submit']");
+          for (var i = 0; i < atcButtons.length; i++) {
+            atcButtons[i].addEventListener('click', function () {
+              if (klAjax) {
+                _learnq.push(['track', 'Added to Cart', item]);
+                klAjax = false;
+              }
+            });
+          }
+        });
+      </script>
+    {% endif %}
+    <main
+      id="MainContent"
+      class="content-for-layout"
+      role="main"
+      data-page-transition-enabled="{{ settings.page_transition_enabled }}"
+      data-product-transition="{{ settings.transition_to_main_product }}"
+      data-template="{{ template }}"
+    >
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    {% render 'search-modal' %}
+
+    {% if settings.quick_add or settings.mobile_quick_add %}
+      {% render 'quick-add-modal' %}
+    {% endif %}
+    {% liquid
+      assign days_on = 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday'
+      assign now_day = 'now' | date: '%A'
+      assign now_hour = 'now' | date: '%H%M' | abs
+    %}
+
+        {% comment %}
+          {{ content_for_header }}
+        {% endcomment %}
+  {% capture modified_content_for_header %}{{ content_for_header }}{% endcapture %}
+{% assign domcontentloadeda = "document.addEventListener('DOMContentLoaded'" %}
+{% assign startasyncloadinga = "document.addEventListener('StartAsyncLoading'" %}
+{% assign domcontentloaded = 'e.addEventListener("DOMContentLoaded"' %}
+{% assign startasyncloading = 'e.addEventListener("StartAsyncLoading"' %}
+{% assign rapp = ", asyncLoad" %}{% assign napp = ", function(){}" %}
+{% assign rappload = "if(window.attachEvent)" %}
+{% assign nappload = "document.addEventListener('StartAsyncLoading', function(event){asyncLoad();});if(window.attachEvent)" %}
+
+{% assign rstorefrontload = "var customDocumentWrite = function(content)" %}
+{% assign nstorefrontload = "document.addEventListener('StartKernelLoading', function() { document.dispatchEvent(new CustomEvent('StartShopifyLoading')); var customDocumentWrite = function(content) " %}
+{% assign rstorefront = "document.getElementsByTagName('head')[0].appendChild(eventsListenerScript)" %}
+{% assign nstorefront = "document.getElementsByTagName('head')[0].appendChild(eventsListenerScript);}" %}
+
+{% if template == 'cart' %}
+  {{ modified_content_for_header | replace: 'src=', 'data-src=' | replace: domcontentloadeda, startasyncloadinga | replace: domcontentloaded, startasyncloading | replace: rapp, napp | replace: rappload, nappload }}
+{% else %}
+  {{ modified_content_for_header | replace: 'src=', 'data-src=' | replace: domcontentloadeda, startasyncloadinga | replace: domcontentloaded, startasyncloading | replace: rapp, napp | replace: rappload, nappload | replace: rstorefrontload, nstorefrontload | replace: rstorefront, nstorefront }}
+{% endif %}
+
+
+    {% if days_on contains now_day %}
+      {% if now_hour >= 0000 and now_hour <= 2359 %}
+        <div class="redlemon-wa">
+          <a
+            href="https://wa.me/525574921505?text=%C2%BFEstoy%20interesado%20en%20este%20producto%20y%20tengo%20algunas%20dudas%3F%20%C2%BFPueden%20ayudarme%3F"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {% render 'icon-wa' %}
+          </a>
+        </div>
+
+        <style>
+          .redlemon-wa {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            left: auto;
+            right: 0px;
+            bottom: 60px;
+            z-index: 999999;
+          }
+
+          .redlemon-wa a {
+            display: block;
+          }
+
+          .redlemon-wa svg {
+            max-width: 50px;
+            height: auto;
+          }
+
+          @media screen and (min-width: 1024px) {
+            .redlemon-wa {
+              width: 70px;
+              height: 70px;
+            }
+            .redlemon-wa svg {
+              max-width: 70px;
+              height: auto;
+            }
+          }
+        </style>
+      {% endif %}
+    {% endif %}
+
+    <script>
+      (function() {
+        var fired = false;
+        var events = ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'];
+        
+        function triggerAsyncLoad() {
+          if (fired) return;
+          fired = true;
+          
+          // Reparar etiquetas genéricas con data-src si el replace del content_for_header afectó alguna etiqueta en duro
+          var scripts = document.querySelectorAll('script[data-src]');
+          for (var i = 0; i < scripts.length; i++) {
+            var s = document.createElement('script');
+            s.src = scripts[i].getAttribute('data-src');
+            s.async = true;
+            document.head.appendChild(s);
+            scripts[i].parentNode.removeChild(scripts[i]);
+          }
+          
+          // Disparar los eventos hack del content_for_header
+          document.dispatchEvent(new CustomEvent('StartAsyncLoading'));
+          document.dispatchEvent(new CustomEvent('StartKernelLoading'));
+          document.dispatchEvent(new CustomEvent('StartShopifyLoading'));
+          
+          // Remover temporal listeners
+          events.forEach(function(e) { window.removeEventListener(e, triggerAsyncLoad); });
+        }
+        
+        // Disparar en primer interacción o timeout de respaldo de 15s
+        events.forEach(function(e) { window.addEventListener(e, triggerAsyncLoad, {passive: true, once: true}); });
+        setTimeout(triggerAsyncLoad, 15000);
+      })();
+    </script>
+  </body>
+</html>

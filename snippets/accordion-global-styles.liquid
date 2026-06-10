@@ -1,0 +1,33 @@
+{% comment %}
+  Estilos globales para asegurar que los acordeones ocupen el 100% del ancho
+{% endcomment %}
+
+<style>
+  /* Forzar 100% de ancho en TODOS los niveles - contenedores y bloques */
+  div[id*="shopify-block"],
+  div[id*="shopify-block"] > *,
+  div[id*="shopify-block"] .group-block,
+  div[id*="shopify-block"] .group-block > *,
+  [id*="shopify-block"][id*="group_accordions"],
+  [id*="shopify-block"][id*="group_accordions"] > *,
+  [id*="shopify-block"][id*="custom_sucursales"],
+  [id*="shopify-block"][id*="custom_description"],
+  [id*="shopify-block"][id*="custom-accordion"],
+  [data-block-type="custom-sucursales"],
+  [data-block-type="custom-product-description-accordion"],
+  [data-block-type="custom-accordion"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  /* Asegurar que los wrappers internos también sean 100% */
+  #sucursales-accordion-wrapper,
+  #description-accordion-wrapper,
+  .generic-accordion-wrapper,
+  .sucursales-accordion,
+  .description-accordion {
+    width: 100% !important;
+    max-width: none !important;
+  }
+</style>

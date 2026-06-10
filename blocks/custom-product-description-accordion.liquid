@@ -1,0 +1,175 @@
+{% comment %}
+  Bloque: Descripción del Producto en Acordeón
+
+  Funcionalidad:
+  - Muestra la descripción del producto en un acordeón desplegable
+  - Diseño consistente con el acordeón de sucursales
+  - Optimizado para performance (sin console.log innecesarios)
+{% endcomment %}
+
+{% if product.description != blank %}
+  <div id="description-accordion-wrapper" class="description-accordion">
+    <button
+      class="accordion-header-description"
+      onclick="toggleDescription()"
+      style="
+        width: 100%;
+        border: none;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
+        text-align: left;
+        transition: all 0.3s;
+        cursor: pointer;
+        padding: 1rem 0;
+        font-weight: 600;
+        background: transparent !important;
+        color: #000;
+      "
+      onmouseover="this.style.color='#666'"
+      onmouseout="this.style.color='#000'"
+    >
+      <span>Descripción del Producto</span>
+      <svg
+        id="description-icon"
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        style="transition: transform 0.3s ease; flex-shrink: 0; margin-left: 10px;"
+      >
+        <path
+          d="M5 7.5L10 12.5L15 7.5"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
+    <div
+      id="description-content"
+      style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease; width: 100%;"
+    >
+      <div style="padding: 1rem 0; width: 100%;">
+        <div class="product-description-text">
+          {{ product.description }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// Variables de estado
+let descriptionIsOpen = false;
+
+// Función para toggle del acordeón
+function toggleDescription() {
+  const content = document.getElementById('description-content');
+  const icon = document.getElementById('description-icon');
+
+  descriptionIsOpen = !descriptionIsOpen;
+
+  if (descriptionIsOpen) {
+    content.style.maxHeight = content.scrollHeight + 'px';
+    icon.style.transform = 'rotate(180deg)';
+  } else {
+    content.style.maxHeight = '0';
+    icon.style.transform = 'rotate(0deg)';
+  }
+}
+  </script>
+
+  <style>
+    #description-accordion-wrapper,
+    #description-accordion-wrapper *,
+    .description-accordion,
+    .description-accordion * {
+      box-sizing: border-box !important;
+    }
+
+    #description-accordion-wrapper {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    #description-content,
+    #description-content > div {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .accordion-header-description {
+      width: 100% !important;
+    }
+
+    .product-description-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .product-description-text p {
+      margin-bottom: 1rem;
+    }
+
+    .product-description-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .product-description-text ul,
+    .product-description-text ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .product-description-text h1,
+    .product-description-text h2,
+    .product-description-text h3,
+    .product-description-text h4 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .product-description-text h1 {
+      font-size: 1.5rem;
+    }
+
+    .product-description-text h2 {
+      font-size: 1.25rem;
+    }
+
+    .product-description-text h3 {
+      font-size: 1.125rem;
+    }
+
+    .product-description-text h4 {
+      font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .product-description-text {
+        font-size: 13px;
+      }
+
+      .accordion-header-description {
+        font-size: 15px !important;
+      }
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Descripción (Acordeón)",
+  "tag": "div",
+  "settings": []
+}
+{% endschema %}

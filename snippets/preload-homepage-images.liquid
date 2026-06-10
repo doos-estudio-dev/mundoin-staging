@@ -1,0 +1,50 @@
+{% comment %}
+  Precarga las primeras imágenes visibles en el homepage para mejorar LCP (Largest Contentful Paint)
+  Este snippet debe incluirse en el <head> del theme.liquid
+
+  Uso: {% render 'preload-homepage-images' %}
+
+  IMPORTANTE: Este snippet está optimizado para la sección home.liquid personalizada
+  Precarga automáticamente:
+  - Logo del header
+  - Primera imagen del banner carousel (desktop y mobile)
+  - Primeras imágenes de colecciones visibles
+{% endcomment %}
+
+{% if template.name == 'index' %}
+
+  {% comment %} 1. Precargar el logo del header (siempre visible) {% endcomment %}
+  {% if settings.logo != blank %}
+    <link
+      rel="preload"
+      as="image"
+      href="{{ settings.logo | image_url: width: 300 }}"
+      fetchpriority="high">
+  {% endif %}
+
+  {% comment %}
+    2. Precargar el primer banner (Hero) identificado como LCP principal.
+    Usamos el filtro file_url/file_img_url para asegurar el descubrimiento del recurso desde el primer byte del HTML.
+  {% endcomment %}
+  
+  {% comment %} Preload para Mobile (LCP Primario) {% endcomment %}
+  <link
+    rel="preload"
+    as="image"
+    href="{{ 'BANNER1_MOB.jpg' | file_img_url: '800x' }}"
+    imagesrcset="{{ 'BANNER1_MOB.jpg' | file_img_url: '375x' }} 375w, {{ 'BANNER1_MOB.jpg' | file_img_url: '550x' }} 550w, {{ 'BANNER1_MOB.jpg' | file_img_url: '750x' }} 750w, {{ 'BANNER1_MOB.jpg' | file_img_url: '800x' }} 800w"
+    imagesizes="(min-width: 769px) 1px, 100vw"
+    media="(max-width: 768px)"
+    fetchpriority="high">
+
+  {% comment %} Preload para Desktop {% endcomment %}
+  <link
+    rel="preload"
+    as="image"
+    href="{{ 'BANNER1.jpg' | file_img_url: '2400x' }}"
+    imagesrcset="{{ 'BANNER1.jpg' | file_img_url: '1100x' }} 1100w, {{ 'BANNER1.jpg' | file_img_url: '1500x' }} 1500w, {{ 'BANNER1.jpg' | file_img_url: '1780x' }} 1780w, {{ 'BANNER1.jpg' | file_img_url: '2000x' }} 2000w, {{ 'BANNER1.jpg' | file_img_url: '2400x' }} 2400w"
+    imagesizes="(max-width: 768px) 1px, 100vw"
+    media="(min-width: 769px)"
+    fetchpriority="high">
+
+{% endif %}

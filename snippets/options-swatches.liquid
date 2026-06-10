@@ -1,0 +1,305 @@
+{%- comment -%}
+  Renderiza swatches para opciones de producto
+
+  @param {object} product - Producto
+  @param {object} selected_variant - Variante seleccionada
+  @param {object} option - Opción del producto (de product.options_with_values)
+  @param {number} option_index - Índice de la opción (0, 1, 2)
+  @param {boolean} show_swatches - Si mostrar swatches (default: true)
+  @param {number} swatch_size - Tamaño del swatch (default: 44)
+  @param {string} swatches_option_style - "color_swatch" o "variant_image"
+  @param {string} sold_out_options - "disabled", "hidden", o vacío
+
+  Uso:
+  {% render 'options-swatches',
+    product: product,
+    selected_variant: product.selected_or_first_available_variant,
+    option: option,
+    option_index: forloop.index0,
+    show_swatches: true,
+    swatch_size: 44
+  %}
+{%- endcomment -%}
+
+{%- liquid
+  # Defaults
+  unless swatch_size
+    assign swatch_size = settings.swatches_product_page_size | default: 44
+  endunless
+
+  unless swatches_option_style
+    assign swatches_option_style = settings.swatches_option_style | default: 'color_swatch'
+  endunless
+
+  assign use_variant_images = false
+  if swatches_option_style == 'variant_image'
+    assign use_variant_images = true
+  endif
+
+  # Determinar qué opción key usar (option1, option2, option3)
+  assign swatch_option_position = option_index | plus: 1
+  assign swatch_option_key = 'option' | append: swatch_option_position
+
+  # Forma del swatch
+  assign swatch_shape_class = 'swatch-circle'
+  if settings.swatches_shape == 'square'
+    assign swatch_shape_class = 'swatch-square'
+  endif
+
+  # Obtener valor seleccionado
+  assign selected_value = option.selected_value
+  if selected_variant
+    if swatch_option_position == 1
+      assign selected_value = selected_variant.option1
+    elsif swatch_option_position == 2
+      assign selected_value = selected_variant.option2
+    elsif swatch_option_position == 3
+      assign selected_value = selected_variant.option3
+    endif
+  endif
+-%}
+
+<fieldset class="option-swatches" data-option-swatches data-option-index="{{ option_index }}">
+  <legend class="option-swatches__legend">
+    <span class="option-name" data-option-name>
+      {{ option.name }}: <strong data-selected-value-text>{{ selected_value }}</strong>
+    </span>
+  </legend>
+
+  <div class="option-values" data-option-values data-option-index="{{ option_index }}">
+    {%- for value in option.values -%}
+      {%- liquid
+        # Verificar disponibilidad de la opción
+        assign option_available = false
+        assign option_variant_id = null
+
+        for variant in product.variants
+          if variant[swatch_option_key] == value
+            if variant.available
+              assign option_available = true
+              assign option_variant_id = variant.id
+              break
+            elsif option_variant_id == null
+              assign option_variant_id = variant.id
+            endif
+          endif
+        endfor
+
+        # Determinar si está seleccionado
+        assign is_selected = false
+        if value == selected_value
+          assign is_selected = true
+        endif
+
+        # Generar estilos del swatch
+      -%}
+      {%- capture swatch_styles -%}
+        {%- render 'swatch-styles',
+          color_name: value,
+          swatch_size: swatch_size,
+          use_variant_images: use_variant_images,
+          swatch_product: product,
+          swatch_option_key: swatch_option_key
+        -%}
+      {%- endcapture -%}
+      {%- liquid
+
+        # Separar variables CSS del resto
+        assign swatch_styles_parts = swatch_styles | split: '/* variables */'
+        assign swatch_inline_styles = swatch_styles_parts[0] | strip
+        assign swatch_css_variables = swatch_styles_parts[1] | strip
+      -%}
+
+      <div class="option-value" data-option-value-wrapper>
+        <input
+          type="radio"
+          class="swatch-input"
+          id="swatch-{{ product.id }}-{{ option_index }}-{{ forloop.index0 }}"
+          name="options[{{ option.name | escape }}]"
+          value="{{ value | escape }}"
+          aria-label="{{ value | escape }}"
+          tabindex="0"
+          data-option-value
+          data-option-index="{{ option_index }}"
+          data-variant-id="{{ option_variant_id }}"
+          data-available="{{ option_available }}"
+          {% if is_selected %}checked{% endif %}
+          {% unless option_available %}
+            {% if sold_out_options == 'disabled' %}disabled{% endif %}
+          {% endunless %}
+        >
+
+        <label
+          for="swatch-{{ product.id }}-{{ option_index }}-{{ forloop.index0 }}"
+          class="swatch-label"
+          data-swatch-label
+        >
+          <span
+            class="swatch-wrapper {{ swatch_shape_class }}"
+            data-swatch-tooltip="{{ value | escape }}"
+            title="{{ value | escape }}"
+          >
+            <div
+              class="swatch"
+              style="width: {{ swatch_size }}px; height: {{ swatch_size }}px; {{ swatch_css_variables }}"
+            >
+              <div
+                class="swatch-inner"
+                style="{{ swatch_inline_styles }}"
+              ></div>
+            </div>
+          </span>
+        </label>
+      </div>
+
+      {%- if sold_out_options == 'hidden' and option_available == false -%}
+        {%- comment -%} Ocultar variantes agotadas {%- endcomment -%}
+        <style>
+          #swatch-{{ product.id }}-{{ option_index }}-{{ forloop.index0 }},
+          label[for="swatch-{{ product.id }}-{{ option_index }}-{{ forloop.index0 }}"] {
+            display: none;
+          }
+        </style>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</fieldset>
+
+{%- comment -%} Estilos inline específicos para este fieldset {%- endcomment -%}
+<style>
+  .option-swatches[data-option-index="{{ option_index }}"] {
+    border: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .option-swatches__legend {
+    margin-bottom: 0.75rem;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .option-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(var(--color-foreground-rgb));
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .option-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .option-value {
+    position: relative;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-label {
+    cursor: pointer;
+    display: block;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-wrapper {
+    display: block;
+    position: relative;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-circle .swatch {
+    border-radius: 50%;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-square .swatch {
+    border-radius: 4px;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-inner {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: inherit;
+    transition: border 0.2s ease;
+  }
+
+  /* Hover */
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input:hover + .swatch-label .swatch-inner,
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-label:hover .swatch-inner {
+    border: 2px solid rgba(0, 0, 0, 0.4);
+    transform: scale(1.05);
+  }
+
+  /* Focus (accesibilidad) */
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input:focus + .swatch-label .swatch {
+    outline: 2px solid rgb(var(--color-foreground-rgb));
+    outline-offset: 2px;
+  }
+
+  /* Checked/Selected */
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input:checked + .swatch-label .swatch-inner {
+    border: 2px solid rgb(var(--color-foreground-rgb));
+    box-shadow: 0 0 0 2px rgba(var(--color-foreground-rgb), 0.1);
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input:checked + .swatch-label .swatch {
+    transform: scale(1.05);
+  }
+
+  /* Disabled/Agotado */
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input:disabled + .swatch-label {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-input[data-available="false"] + .swatch-label .swatch::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjEwMCUiIHkyPSIxMDAlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiPjwvbGluZT48L3N2Zz4=");
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Tooltip */
+  .option-swatches[data-option-index="{{ option_index }}"] .swatch-wrapper[data-swatch-tooltip]:hover::after {
+    content: attr(data-swatch-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgb(var(--color-foreground-rgb));
+    color: rgb(var(--color-background-rgb));
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin-bottom: 0.5rem;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .option-swatches[data-option-index="{{ option_index }}"] .swatch {
+      width: 36px !important;
+      height: 36px !important;
+    }
+  }
+</style>

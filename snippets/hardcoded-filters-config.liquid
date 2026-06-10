@@ -1,0 +1,76 @@
+{%- comment -%}
+  Configuración de filtros hardcodeados basados en metacampos
+
+  Este archivo define todos los filtros disponibles para usar con metacampos.
+  Cada filtro usa el formato de Shopify: filter.p.m.{namespace}.{key}
+
+  Para usar este sistema:
+  1. Activa "Usar filtros de metacampos" en las configuraciones del bloque de filtros
+  2. Los filtros se mostrarán automáticamente según los valores disponibles en la colección
+  3. Para agregar/quitar filtros, edita la lista hardcoded_filters abajo
+{%- endcomment -%}
+
+{%- liquid
+  # Array de configuración de filtros
+  # Formato: 'namespace|key|label'
+
+  assign hardcoded_filters_raw = ''
+
+  # ============================================
+  # FILTROS CUSTOM (namespace: custom)
+  # ============================================
+
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|categoria|Categoría,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|espacio2|Espacio,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|estilo|Estilo,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|material_asiento|Material asiento,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|material_pata|Material pata,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|brazo|Brazo,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|armado|Armado,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|forma|Forma,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|capacidad|Capacidad,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|material_cubierta|Material Cubierta,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|plazas|Plazas,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|cojines|Cojines,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|cajones|Cajones,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|descansabrazos|Descansabrazos,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|cabecera|Cabecera,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|soporte_lumbar|Soporte lumbar,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|altura|Altura,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|materia_superficie|Material superficie,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|para_cuantas_personas|Para cuántas personas,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|gavetas|Gavetas,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|para_documentos|Para documentos,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|movilidad|Movilidad,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|material_base|Material base,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'custom|recomendacion_para_pantallas|Recomendación pantallas,'
+
+  # ============================================
+  # FILTROS SHOPIFY (namespace: shopify)
+  # ============================================
+
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|seat-type|Tipo de asiento,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|back-type|Tipo de respaldo,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|furniture-fixture-material|Material de muebles,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|color-pattern|Color,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|upholstery-material|Material de tapicería,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|backrest-type|Tipo de espaldar,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|firmness|Firmeza,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|leg-color|Color de la pata,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|frame-material|Material del marco,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|upholstery-color|Color de tapicería,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|tabletop-color|Color del tope de mesa,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|leg-material|Material de la pata,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|tabletop-material|Material del tope de mesa,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|frame-color|Color del marco,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|chair-features|Características de silla,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|shape|Forma,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|shelf-material|Material del estante,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|bedding-size|Tamaño de ropa de cama,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|suitable-location|Ubicación adecuada,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|mounting-type|Tipo de montura,'
+  assign hardcoded_filters_raw = hardcoded_filters_raw | append: 'shopify|material|Material'
+
+  # Convertir a array
+  assign hardcoded_filters_list = hardcoded_filters_raw | split: ','
+-%}

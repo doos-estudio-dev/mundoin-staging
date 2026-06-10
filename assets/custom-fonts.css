@@ -1,0 +1,233 @@
+/**
+ * Custom Font Overrides - Global
+ *
+ * Homologación de fuentes para todo el sitio:
+ * - Proza Libre: Encabezados (h1, h2, h3, h4, h5, h6)
+ * - Montserrat: TODO lo demás (párrafos, botones, links, inputs, etc.)
+ */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Proza+Libre:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* ========================================
+   PASO 1: Montserrat para TODOS los elementos por defecto
+   ======================================== */
+
+/* Sobrescribir TODAS las variables CSS del tema */
+:root {
+  /* Variables de encabezados */
+  --font-h1--family: "Proza Libre", sans-serif !important;
+  --font-h2--family: "Proza Libre", sans-serif !important;
+  --font-h3--family: "Proza Libre", sans-serif !important;
+  --font-h4--family: "Proza Libre", sans-serif !important;
+  --font-h5--family: "Proza Libre", sans-serif !important;
+  --font-h6--family: "Proza Libre", sans-serif !important;
+  --font-heading--family: "Proza Libre", sans-serif !important;
+
+  /* Variables de cuerpo - TODO usa Montserrat */
+  --font-paragraph--family: Montserrat, sans-serif !important;
+  --font-body--family: Montserrat, sans-serif !important;
+  --font-subheading--family: Montserrat, sans-serif !important;
+  --font-accent--family: Montserrat, sans-serif !important;
+
+  /* Botones */
+  --button-font-family-primary: "Proza Libre", sans-serif !important;
+  --button-font-family-secondary: Montserrat, sans-serif !important;
+
+  /* Carrito */
+  --cart-primary-font-family: Montserrat, sans-serif !important;
+  --cart-secondary-font-family: Montserrat, sans-serif !important;
+}
+
+/* Aplicar Montserrat a TODOS los elementos como base */
+* {
+  font-family: Montserrat, sans-serif !important;
+}
+
+html,
+body {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* ========================================
+   PASO 2: Proza Libre SOLO para encabezados
+   ======================================== */
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6,
+.heading,
+.title,
+[class*="heading"],
+[class*="title"]:not([class*="subtitle"]) {
+  font-family: "Proza Libre", sans-serif !important;
+}
+
+/* Encabezados dentro de bloques específicos */
+.text-block h1,
+.text-block h2,
+.text-block h3,
+.text-block h4,
+.text-block h5,
+.text-block h6,
+.rte h1,
+.rte h2,
+.rte h3,
+.rte h4,
+.rte h5,
+.rte h6,
+.product-title h1,
+.product-title h2,
+.section-heading,
+.page-title,
+.collection-title,
+.article-title,
+cart-title,
+.jumbo-text {
+  font-family: "Proza Libre", sans-serif !important;
+}
+
+/* Botones primarios con Proza Libre */
+.button--primary,
+.shopify-payment-button__button,
+button.button--primary,
+[type="submit"].button--primary,
+.product-form__submit,
+.cart__checkout-button,
+.checkout-button--primary,
+[class*="primary-button"] {
+  font-family: "Proza Libre", sans-serif !important;
+}
+
+/* ========================================
+   PASO 3: Asegurar Montserrat en elementos específicos
+   ======================================== */
+
+/* Párrafos, textos, links */
+p, .paragraph,
+span,
+a, .link,
+li,
+label,
+.caption,
+.text,
+.description,
+.price,
+.product-price,
+.variant-option {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Botones secundarios y normales */
+button:not(.button--primary),
+.button:not(.button--primary),
+.button--secondary,
+.button--link,
+[type="button"],
+[type="reset"],
+input[type="submit"]:not(.button--primary) {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Formularios */
+input,
+textarea,
+select,
+option,
+.input,
+.form-field,
+.search-input {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Navegación y menús */
+nav,
+.nav,
+.menu,
+.menu-item,
+.header-menu,
+.mega-menu,
+.submenu,
+.breadcrumb,
+[class*="menu"],
+[class*="nav"] {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Carrito */
+.cart,
+.cart-drawer,
+.cart-item,
+.cart-item__name,
+.cart-item__price,
+.cart-item__quantity,
+.cart__total,
+.cart__subtotal,
+.cart__footer,
+.mini-cart,
+[data-cart-drawer],
+[data-cart-item],
+[class*="cart"] {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Productos */
+.product-card,
+.product-info,
+.product-description,
+.product-vendor,
+.product-sku,
+.variant-picker,
+.swatch,
+[class*="product"]:not([class*="product-title"]) {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Footer */
+footer,
+.footer,
+.footer-menu,
+.footer-text,
+[class*="footer"] {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Badges, etiquetas, pills */
+.badge,
+.tag,
+.pill,
+.label-tag,
+[class*="badge"] {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Notificaciones y alertas */
+.alert,
+.notice,
+.message,
+.notification,
+.toast,
+[class*="alert"],
+[class*="message"] {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Tablas */
+table,
+thead,
+tbody,
+tfoot,
+tr,
+th,
+td {
+  font-family: Montserrat, sans-serif !important;
+}
+
+/* Rich Text Editor */
+.rte,
+.rte *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+  font-family: Montserrat, sans-serif !important;
+}

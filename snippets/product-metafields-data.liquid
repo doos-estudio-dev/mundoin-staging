@@ -1,0 +1,169 @@
+{%- comment -%}
+  Genera atributos data con los metacampos del producto para el sistema de filtros.
+
+  @param {object} product - El producto
+
+  Uso: {% render 'product-metafields-data', product: product %}
+{%- endcomment -%}
+
+{%- if product != blank -%}
+  {%- capture metafields_json -%}
+    {
+      "product": {
+        "type": "{{ product.type | escape }}"
+      },
+      "custom": {
+        {%- comment -%} ===== METACAMPOS CUSTOM ===== {%- endcomment -%}
+        {%- if product.metafields.custom.categoria != blank -%}
+          "categoria": {%- if product.metafields.custom.categoria.value.size > 0 -%}[{%- for item in product.metafields.custom.categoria.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.categoria.value.system.handle | default: product.metafields.custom.categoria.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.espacio2 != blank -%}
+          "espacio2": {%- if product.metafields.custom.espacio2.value.size > 0 -%}[{%- for item in product.metafields.custom.espacio2.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.espacio2.value.system.handle | default: product.metafields.custom.espacio2.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.estilo != blank -%}
+          "estilo": {%- if product.metafields.custom.estilo.value.size > 0 -%}[{%- for item in product.metafields.custom.estilo.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.estilo.value.system.handle | default: product.metafields.custom.estilo.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.armado != blank -%}
+          "armado": {%- if product.metafields.custom.armado.value.size > 0 -%}[{%- for item in product.metafields.custom.armado.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.armado.value.system.handle | default: product.metafields.custom.armado.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.brazo != blank -%}
+          "brazo": {%- if product.metafields.custom.brazo.value.size > 0 -%}[{%- for item in product.metafields.custom.brazo.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.brazo.value.system.handle | default: product.metafields.custom.brazo.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.material_pata != blank -%}
+          "material_pata": {%- if product.metafields.custom.material_pata.value.size > 0 -%}[{%- for item in product.metafields.custom.material_pata.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.material_pata.value.system.handle | default: product.metafields.custom.material_pata.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.material_asiento != blank -%}
+          "material_asiento": {%- if product.metafields.custom.material_asiento.value.size > 0 -%}[{%- for item in product.metafields.custom.material_asiento.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.material_asiento.value.system.handle | default: product.metafields.custom.material_asiento.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.forma != blank -%}
+          "forma": {%- if product.metafields.custom.forma.value.size > 0 -%}[{%- for item in product.metafields.custom.forma.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.forma.value.system.handle | default: product.metafields.custom.forma.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.capacidad != blank -%}
+          "capacidad": {%- if product.metafields.custom.capacidad.value.size > 0 -%}[{%- for item in product.metafields.custom.capacidad.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.capacidad.value.system.handle | default: product.metafields.custom.capacidad.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.cajones != blank -%}
+          "cajones": {%- if product.metafields.custom.cajones.value.size > 0 -%}[{%- for item in product.metafields.custom.cajones.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.cajones.value.system.handle | default: product.metafields.custom.cajones.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.descansabrazos != blank -%}
+          "descansabrazos": {%- if product.metafields.custom.descansabrazos.value.size > 0 -%}[{%- for item in product.metafields.custom.descansabrazos.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.descansabrazos.value.system.handle | default: product.metafields.custom.descansabrazos.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.cabecera != blank -%}
+          "cabecera": {%- if product.metafields.custom.cabecera.value.size > 0 -%}[{%- for item in product.metafields.custom.cabecera.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.cabecera.value.system.handle | default: product.metafields.custom.cabecera.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.cojines != blank -%}
+          "cojines": "{{ product.metafields.custom.cojines.value.system.handle | default: product.metafields.custom.cojines.value | escape }}",
+        {%- endif -%}
+        {%- if product.metafields.custom.plazas != blank -%}
+          "plazas": {%- if product.metafields.custom.plazas.value.size > 0 -%}[{%- for item in product.metafields.custom.plazas.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.plazas.value.system.handle | default: product.metafields.custom.plazas.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.altura != blank -%}
+          "altura": {%- if product.metafields.custom.altura.value.size > 0 -%}[{%- for item in product.metafields.custom.altura.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.altura.value.system.handle | default: product.metafields.custom.altura.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.material_cubierta != blank -%}
+          "material_cubierta": {%- if product.metafields.custom.material_cubierta.value.size > 0 -%}[{%- for item in product.metafields.custom.material_cubierta.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.material_cubierta.value.system.handle | default: product.metafields.custom.material_cubierta.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.soporte_lumbar != blank -%}
+          "soporte_lumbar": {%- if product.metafields.custom.soporte_lumbar.value.size > 0 -%}[{%- for item in product.metafields.custom.soporte_lumbar.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.soporte_lumbar.value.system.handle | default: product.metafields.custom.soporte_lumbar.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.materia_superficie != blank -%}
+          "materia_superficie": {%- if product.metafields.custom.materia_superficie.value.size > 0 -%}[{%- for item in product.metafields.custom.materia_superficie.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.materia_superficie.value.system.handle | default: product.metafields.custom.materia_superficie.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.para_cuantas_personas != blank -%}
+          "para_cuantas_personas": {%- if product.metafields.custom.para_cuantas_personas.value.size > 0 -%}[{%- for item in product.metafields.custom.para_cuantas_personas.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.para_cuantas_personas.value.system.handle | default: product.metafields.custom.para_cuantas_personas.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.gavetas != blank -%}
+          "gavetas": {%- if product.metafields.custom.gavetas.value.size > 0 -%}[{%- for item in product.metafields.custom.gavetas.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.gavetas.value.system.handle | default: product.metafields.custom.gavetas.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.para_documentos != blank -%}
+          "para_documentos": {%- if product.metafields.custom.para_documentos.value.size > 0 -%}[{%- for item in product.metafields.custom.para_documentos.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.para_documentos.value.system.handle | default: product.metafields.custom.para_documentos.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.movilidad != blank -%}
+          "movilidad": {%- if product.metafields.custom.movilidad.value.size > 0 -%}[{%- for item in product.metafields.custom.movilidad.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.movilidad.value.system.handle | default: product.metafields.custom.movilidad.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.material_base != blank -%}
+          "material_base": {%- if product.metafields.custom.material_base.value.size > 0 -%}[{%- for item in product.metafields.custom.material_base.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.material_base.value.system.handle | default: product.metafields.custom.material_base.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.custom.recomendacion_para_pantallas != blank -%}
+          "recomendacion_para_pantallas": {%- if product.metafields.custom.recomendacion_para_pantallas.value.size > 0 -%}[{%- for item in product.metafields.custom.recomendacion_para_pantallas.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.custom.recomendacion_para_pantallas.value.system.handle | default: product.metafields.custom.recomendacion_para_pantallas.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        "_end": true
+      },
+      "shopify": {
+        {%- comment -%} ===== METACAMPOS SHOPIFY ===== {%- endcomment -%}
+        {%- if product.metafields.shopify['color-pattern'] != blank -%}
+          "color-pattern": {%- if product.metafields.shopify['color-pattern'].value.size > 0 -%}[{%- for item in product.metafields.shopify['color-pattern'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['color-pattern'].value.system.handle | default: product.metafields.shopify['color-pattern'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['seat-type'] != blank -%}
+          "seat-type": {%- if product.metafields.shopify['seat-type'].value.size > 0 -%}[{%- for item in product.metafields.shopify['seat-type'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['seat-type'].value.system.handle | default: product.metafields.shopify['seat-type'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['back-type'] != blank -%}
+          "back-type": {%- if product.metafields.shopify['back-type'].value.size > 0 -%}[{%- for item in product.metafields.shopify['back-type'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['back-type'].value.system.handle | default: product.metafields.shopify['back-type'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['furniture-fixture-material'] != blank -%}
+          "furniture-fixture-material": {%- if product.metafields.shopify['furniture-fixture-material'].value.size > 0 -%}[{%- for item in product.metafields.shopify['furniture-fixture-material'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['furniture-fixture-material'].value.system.handle | default: product.metafields.shopify['furniture-fixture-material'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['upholstery-material'] != blank -%}
+          "upholstery-material": {%- if product.metafields.shopify['upholstery-material'].value.size > 0 -%}[{%- for item in product.metafields.shopify['upholstery-material'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['upholstery-material'].value.system.handle | default: product.metafields.shopify['upholstery-material'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['frame-material'] != blank -%}
+          "frame-material": {%- if product.metafields.shopify['frame-material'].value.size > 0 -%}[{%- for item in product.metafields.shopify['frame-material'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['frame-material'].value.system.handle | default: product.metafields.shopify['frame-material'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['leg-material'] != blank -%}
+          "leg-material": {%- if product.metafields.shopify['leg-material'].value.size > 0 -%}[{%- for item in product.metafields.shopify['leg-material'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['leg-material'].value.system.handle | default: product.metafields.shopify['leg-material'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['tabletop-material'] != blank -%}
+          "tabletop-material": {%- if product.metafields.shopify['tabletop-material'].value.size > 0 -%}[{%- for item in product.metafields.shopify['tabletop-material'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['tabletop-material'].value.system.handle | default: product.metafields.shopify['tabletop-material'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify.shape != blank -%}
+          "shape": {%- if product.metafields.shopify.shape.value.size > 0 -%}[{%- for item in product.metafields.shopify.shape.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify.shape.value.system.handle | default: product.metafields.shopify.shape.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['backrest-type'] != blank -%}
+          "backrest-type": {%- if product.metafields.shopify['backrest-type'].value.size > 0 -%}[{%- for item in product.metafields.shopify['backrest-type'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['backrest-type'].value.system.handle | default: product.metafields.shopify['backrest-type'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify.firmness != blank -%}
+          "firmness": {%- if product.metafields.shopify.firmness.value.size > 0 -%}[{%- for item in product.metafields.shopify.firmness.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify.firmness.value.system.handle | default: product.metafields.shopify.firmness.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['leg-color'] != blank -%}
+          "leg-color": {%- if product.metafields.shopify['leg-color'].value.size > 0 -%}[{%- for item in product.metafields.shopify['leg-color'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['leg-color'].value.system.handle | default: product.metafields.shopify['leg-color'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['kitchen-dining-furniture-items-included'] != blank -%}
+          "kitchen-dining-furniture-items-included": {%- if product.metafields.shopify['kitchen-dining-furniture-items-included'].value.size > 0 -%}[{%- for item in product.metafields.shopify['kitchen-dining-furniture-items-included'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['kitchen-dining-furniture-items-included'].value.system.handle | default: product.metafields.shopify['kitchen-dining-furniture-items-included'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify.material != blank -%}
+          "material": {%- if product.metafields.shopify.material.value.size > 0 -%}[{%- for item in product.metafields.shopify.material.value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify.material.value.system.handle | default: product.metafields.shopify.material.value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['office-cart-features'] != blank -%}
+          "office-cart-features": {%- if product.metafields.shopify['office-cart-features'].value.size > 0 -%}[{%- for item in product.metafields.shopify['office-cart-features'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['office-cart-features'].value.system.handle | default: product.metafields.shopify['office-cart-features'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['mounting-type'] != blank -%}
+          "mounting-type": {%- if product.metafields.shopify['mounting-type'].value.size > 0 -%}[{%- for item in product.metafields.shopify['mounting-type'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['mounting-type'].value.system.handle | default: product.metafields.shopify['mounting-type'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['suitable-location'] != blank -%}
+          "suitable-location": {%- if product.metafields.shopify['suitable-location'].value.size > 0 -%}[{%- for item in product.metafields.shopify['suitable-location'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['suitable-location'].value.system.handle | default: product.metafields.shopify['suitable-location'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['upholstery-color'] != blank -%}
+          "upholstery-color": {%- if product.metafields.shopify['upholstery-color'].value.size > 0 -%}[{%- for item in product.metafields.shopify['upholstery-color'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['upholstery-color'].value.system.handle | default: product.metafields.shopify['upholstery-color'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['tabletop-color'] != blank -%}
+          "tabletop-color": {%- if product.metafields.shopify['tabletop-color'].value.size > 0 -%}[{%- for item in product.metafields.shopify['tabletop-color'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['tabletop-color'].value.system.handle | default: product.metafields.shopify['tabletop-color'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['frame-color'] != blank -%}
+          "frame-color": {%- if product.metafields.shopify['frame-color'].value.size > 0 -%}[{%- for item in product.metafields.shopify['frame-color'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['frame-color'].value.system.handle | default: product.metafields.shopify['frame-color'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['chair-features'] != blank -%}
+          "chair-features": {%- if product.metafields.shopify['chair-features'].value.size > 0 -%}[{%- for item in product.metafields.shopify['chair-features'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['chair-features'].value.system.handle | default: product.metafields.shopify['chair-features'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['bedding-size'] != blank -%}
+          "bedding-size": {%- if product.metafields.shopify['bedding-size'].value.size > 0 -%}[{%- for item in product.metafields.shopify['bedding-size'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['bedding-size'].value.system.handle | default: product.metafields.shopify['bedding-size'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        {%- if product.metafields.shopify['shelf-material'] != blank -%}
+          "shelf-material": {%- if product.metafields.shopify['shelf-material'].value.size > 0 -%}[{%- for item in product.metafields.shopify['shelf-material'].value -%}"{{ item.system.handle | default: item | escape }}"{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- else -%}"{{ product.metafields.shopify['shelf-material'].value.system.handle | default: product.metafields.shopify['shelf-material'].value | escape }}"{%- endif -%},
+        {%- endif -%}
+        "_end": true
+      }
+    }
+  {%- endcapture -%}
+
+  {%- assign clean_json = metafields_json | replace: ',"_end": true', '' | replace: ',}', '}' | replace: ', }', '}' | strip -%}
+  data-product-metafields='{{ clean_json }}'
+{%- endif -%}

@@ -1,0 +1,69 @@
+{% schema %}
+{
+  "name": "Klaviyo Form",
+  "settings": [
+    {
+      "type": "text",
+      "id": "form_id",
+      "label": "Klaviyo Form ID",
+      "default": "VGGQiX"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "transparent"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Klaviyo Form"
+    }
+  ]
+}
+{% endschema %}
+
+{%- style -%}
+  .klaviyo-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    background-color: {{ section.settings.bg_color }};
+  }
+
+  @media screen and (min-width: 750px) {
+    .klaviyo-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="klaviyo-section-{{ section.id }} custom-klaviyo-wrapper">
+  <div class="page-width">
+     <div class="klaviyo-form-{{ section.settings.form_id }}"></div>
+  </div>
+</div>

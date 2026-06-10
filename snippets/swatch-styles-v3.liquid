@@ -1,0 +1,13 @@
+{%- liquid
+  assign color_lower = color_name | downcase | strip
+
+  if color_lower == 'tabaco'
+    echo '--swatch-background: url(https://cdn.shopify.com/s/files/1/1233/2374/files/tabaco.png) #8B6B47;'
+  elsif color_lower == 'mostaza'
+    echo '--swatch-background: #FFDB58;'
+  elsif color_lower == 'aceituna'
+    echo '--swatch-background: #6B8E23;'
+  else
+    echo '--swatch-background: gray;'
+  endif
+-%}

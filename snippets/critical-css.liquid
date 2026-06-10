@@ -1,0 +1,126 @@
+{% comment %}
+  Critical CSS - Inlined for faster First Contentful Paint
+  Contains only essential styles for above-the-fold content
+{% endcomment %}
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: var(--color-foreground);
+  background: var(--color-background);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100svh;
+  font-variation-settings: 'slnt' 0;
+}
+
+:root {
+  --hover-lift-amount: 4px;
+  --hover-scale-amount: 1.03;
+  --hover-subtle-zoom-amount: 1.015;
+  --hover-shadow-color: var(--color-shadow);
+  --hover-transition-duration: 0.25s;
+  --hover-transition-timing: ease-out;
+  --surface-transition-duration: 0.3s;
+  --surface-transition-timing: var(--ease-out-quad);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--color-foreground-rgb) / var(--opacity-40)) var(--color-background);
+  scroll-behavior: smooth;
+}
+
+html[scroll-lock] {
+  overflow: hidden;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  border-radius: var(--style-border-radius-inputs);
+}
+
+select {
+  background-color: var(--color-background);
+  color: currentcolor;
+}
+
+dialog {
+  --backdrop-color-rgb: var(--color-shadow-rgb);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Header critical styles */
+#header-group {
+  position: relative;
+  z-index: var(--layer-header, 100);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  background: var(--color-header-background, var(--color-background));
+}
+
+/* Main content */
+#MainContent {
+  flex: 1;
+}
+
+/* Skip to content */
+.skip-to-content-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 9999;
+}
+
+.skip-to-content-link:focus {
+  left: 0;
+  background: var(--color-background);
+  padding: 1rem;
+}
+</style>

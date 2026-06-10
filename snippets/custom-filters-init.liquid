@@ -1,0 +1,296 @@
+{%- comment -%}
+  Inicializa el sistema de filtros personalizados basados en metacampos.
+
+  Este snippet debe incluirse en la sección de colección ANTES de los productos.
+  Genera la configuración de filtros y el contenedor para renderizarlos.
+
+  Uso: {% render 'custom-filters-init' %}
+{%- endcomment -%}
+
+<script>
+  // Configuración de filtros de metacampos
+  // Agrega o quita filtros aquí según necesites
+  window.customFiltersConfig = [
+    // FILTROS CUSTOM (namespace: custom)
+    { namespace: 'custom', key: 'categoria', label: 'Categoría' },
+    { namespace: 'custom', key: 'espacio2', label: 'Espacio' },
+    { namespace: 'custom', key: 'estilo', label: 'Estilo' },
+    { namespace: 'custom', key: 'material_asiento', label: 'Material asiento' },
+    { namespace: 'custom', key: 'material_pata', label: 'Material pata' },
+    { namespace: 'custom', key: 'brazo', label: 'Brazo' },
+    { namespace: 'custom', key: 'armado', label: 'Armado' },
+    { namespace: 'custom', key: 'forma', label: 'Forma' },
+    { namespace: 'custom', key: 'capacidad', label: 'Capacidad' },
+    { namespace: 'custom', key: 'material_cubierta', label: 'Material Cubierta' },
+    { namespace: 'custom', key: 'plazas', label: 'Plazas' },
+    { namespace: 'custom', key: 'cojines', label: 'Cojines' },
+    { namespace: 'custom', key: 'cajones', label: 'Cajones' },
+    { namespace: 'custom', key: 'descansabrazos', label: 'Descansabrazos' },
+    { namespace: 'custom', key: 'cabecera', label: 'Cabecera' },
+    { namespace: 'custom', key: 'soporte_lumbar', label: 'Soporte lumbar' },
+    { namespace: 'custom', key: 'altura', label: 'Altura' },
+    { namespace: 'custom', key: 'materia_superficie', label: 'Material superficie' },
+    { namespace: 'custom', key: 'para_cuantas_personas', label: 'Para cuántas personas' },
+    { namespace: 'custom', key: 'gavetas', label: 'Gavetas' },
+    { namespace: 'custom', key: 'para_documentos', label: 'Para documentos' },
+    { namespace: 'custom', key: 'movilidad', label: 'Movilidad' },
+    { namespace: 'custom', key: 'material_base', label: 'Material base' },
+    { namespace: 'custom', key: 'recomendacion_para_pantallas', label: 'Recomendación pantallas' },
+
+    // FILTROS SHOPIFY (namespace: shopify)
+    { namespace: 'shopify', key: 'color-pattern', label: 'Color' },
+    { namespace: 'shopify', key: 'furniture-fixture-material', label: 'Material de muebles' },
+    { namespace: 'shopify', key: 'upholstery-material', label: 'Material de tapicería' },
+    { namespace: 'shopify', key: 'frame-material', label: 'Material del marco' },
+    { namespace: 'shopify', key: 'leg-material', label: 'Material de la pata' },
+    { namespace: 'shopify', key: 'tabletop-material', label: 'Material del tope de mesa' },
+    { namespace: 'shopify', key: 'seat-type', label: 'Tipo de asiento' },
+    { namespace: 'shopify', key: 'back-type', label: 'Tipo de respaldo' },
+    { namespace: 'shopify', key: 'shape', label: 'Forma' }
+  ];
+</script>
+
+<script src="{{ 'custom-filters.js' | asset_url }}" defer></script>
+
+<style>
+  /* Estilos para el sistema de filtros personalizados */
+  .custom-filters-wrapper {
+    margin-bottom: var(--margin-lg, 24px);
+  }
+
+  .custom-filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--margin-md, 16px);
+    padding-bottom: var(--padding-sm, 8px);
+    border-bottom: 1px solid var(--color-border, #e5e5e5);
+  }
+
+  .custom-filters-title {
+    font-size: var(--font-h4--size, 16px);
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .custom-filters-clear {
+    background: none;
+    border: none;
+    color: var(--color-foreground-muted, #666);
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .custom-filters-clear:hover {
+    color: var(--color-foreground, #000);
+  }
+
+  #custom-filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .custom-filter {
+    border-bottom: 1px solid var(--color-border, #e5e5e5);
+  }
+
+  .custom-filter__panel {
+    width: 100%;
+  }
+
+  .custom-filter__summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .custom-filter__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .custom-filter__label {
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .custom-filter__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .custom-filter__icon {
+    transition: transform 0.2s ease;
+  }
+
+  .custom-filter__panel[open] .custom-filter__icon {
+    transform: rotate(180deg);
+  }
+
+  .custom-filter__content {
+    padding-bottom: 16px;
+  }
+
+  .custom-filter__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .custom-filter__item {
+    margin: 0;
+  }
+
+  .custom-filter__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+
+  .custom-filter__checkbox:hover .custom-filter__text {
+    color: var(--color-foreground, #000);
+  }
+
+  .custom-filter__input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .custom-filter__checkmark {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--color-border, #ccc);
+    border-radius: 3px;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .custom-filter__input:checked + .custom-filter__checkmark {
+    background: var(--color-foreground, #000);
+    border-color: var(--color-foreground, #000);
+  }
+
+  .custom-filter__input:checked + .custom-filter__checkmark::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--color-background, #fff);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .custom-filter__input:focus-visible + .custom-filter__checkmark {
+    outline: 2px solid var(--color-foreground, #000);
+    outline-offset: 2px;
+  }
+
+  .custom-filter__text {
+    flex: 1;
+    color: var(--color-foreground-muted, #666);
+    transition: color 0.15s ease;
+  }
+
+  .custom-filter__input:checked ~ .custom-filter__text {
+    color: var(--color-foreground, #000);
+    font-weight: 500;
+  }
+
+  .custom-filter__value-count {
+    color: var(--color-foreground-muted, #999);
+    font-size: 12px;
+  }
+
+  .custom-filters-loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-foreground-muted, #666);
+  }
+
+  /* Responsive */
+  @media (max-width: 749px) {
+    .custom-filters-mobile-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--color-background, #fff);
+      border: 1px solid var(--color-border, #e5e5e5);
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .custom-filters-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--color-background, #fff);
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .custom-filters-drawer.is-open {
+      transform: translateX(0);
+    }
+
+    .custom-filters-drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border, #e5e5e5);
+    }
+
+    .custom-filters-drawer-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+    }
+  }
+
+  @media (min-width: 750px) {
+    .custom-filters-mobile-toggle {
+      display: none;
+    }
+  }
+</style>

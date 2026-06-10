@@ -1,0 +1,125 @@
+{% if product.metafields.custom.sucursales %}
+<div id="sucursales-accordion-wrapper" class="sucursales-accordion" style="display:none">
+  <button class="accordion-header" onclick="toggleSucursales()" style="width:100%;border:none;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;font-size:16px;text-align:left;cursor:pointer;padding:1rem 0;font-weight:600;background:transparent;color:#000">
+    <span>Disponibilidad en Sucursales</span>
+    <svg id="accordion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="transition:transform .3s;flex-shrink:0;margin-left:10px"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="sucursales-content" style="max-height:0;overflow:hidden;transition:max-height .3s;width:100%">
+    <div style="padding:1rem 0;width:100%"><div id="sucursales-table-container" style="width:100%"></div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const raw = {{ product.metafields.custom.sucursales }};
+  const data = raw.sucursales || raw;
+  if(!data?.sucursales?.length || !data?.variantes?.length) return;
+
+  const wrapper = document.getElementById('sucursales-accordion-wrapper');
+  const container = document.getElementById('sucursales-table-container');
+  const content = document.getElementById('sucursales-content');
+  const icon = document.getElementById('accordion-icon');
+  let isOpen = false;
+
+  window.toggleSucursales = function(){
+    isOpen = !isOpen;
+    content.style.maxHeight = isOpen ? content.scrollHeight + 'px' : '0';
+    icon.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0)';
+  };
+
+  function getSelectedOption(){
+    // Buscar radio checked en variant-picker
+    const vp = document.querySelector('variant-picker');
+    if(vp){
+      const checked = vp.querySelector('input[type="radio"]:checked');
+      if(checked) return checked.value.toLowerCase().trim();
+    }
+    // Fallback: select
+    const sel = document.querySelector('select[name^="option"]');
+    if(sel?.value) return sel.value.toLowerCase().trim();
+    return '';
+  }
+
+  function findVariant(optionText){
+    if(!optionText) return data.variantes[0];
+    return data.variantes.find(v =>
+      v.opciones.some(o => {
+        const val = o.valor.toLowerCase().trim();
+        return val === optionText || optionText.includes(val) || val.includes(optionText);
+      })
+    ) || data.variantes[0];
+  }
+
+  function render(){
+    const opt = getSelectedOption();
+    const variant = findVariant(opt);
+    if(!variant){ wrapper.style.display = 'none'; return; }
+
+    const stock = data.sucursales
+      .map((s,i) => ({nombre:s.nombre, mapa:s.mapa, qty:variant.cantidades[i]||0}))
+      .filter(s => s.nombre !== 'WEB' && s.qty > 0);
+
+    if(!stock.length){ wrapper.style.display = 'none'; return; }
+
+    wrapper.style.display = 'block';
+    container.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#f8f8f8">
+        <th style="padding:12px;text-align:left;border-bottom:2px solid #e0e0e0;font-weight:600">Sucursal</th>
+        <th style="padding:12px;text-align:center;border-bottom:2px solid #e0e0e0;font-weight:600">Stock</th>
+        <th style="padding:12px;text-align:center;border-bottom:2px solid #e0e0e0;font-weight:600">Ubicación</th>
+      </tr></thead>
+      <tbody>${stock.map(s => `<tr style="border-bottom:1px solid #f0f0f0">
+        <td style="padding:14px 12px"><strong>${s.nombre}</strong></td>
+        <td style="padding:14px 12px;text-align:center"><span style="color:#2e7d32;font-weight:500">${s.qty}</span></td>
+        <td style="padding:14px 12px;text-align:center"><a href="${s.mapa}" target="_blank" rel="noopener" style="display:inline-block;padding:6px 14px;background:#7EB4C1;color:#fff;text-decoration:none;border-radius:1px;font-size:14px">Ver mapa</a></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+
+    if(isOpen) content.style.maxHeight = content.scrollHeight + 'px';
+  }
+
+  // Listeners
+  const vp = document.querySelector('variant-picker');
+  if(vp){
+    vp.addEventListener('change', render);
+    vp.addEventListener('click', e => {
+      if(e.target.closest('.variant-option__button-label')) setTimeout(render, 20);
+    });
+  }
+
+  // Polling input[name="id"]
+  const idInput = document.querySelector('input[name="id"]');
+  if(idInput){
+    let last = idInput.value;
+    (function poll(){
+      if(idInput.value !== last){ last = idInput.value; render(); }
+      requestAnimationFrame(poll);
+    })();
+  }
+
+  // Eventos del tema
+  ['variant:change','variantchange','variantUpdate'].forEach(evt =>
+    document.addEventListener(evt, render)
+  );
+
+  // Render inicial
+  render();
+})();
+</script>
+
+<style>
+#sucursales-accordion-wrapper,#sucursales-accordion-wrapper *{box-sizing:border-box}
+#sucursales-accordion-wrapper{width:100%;max-width:100%;margin:0;padding:0}
+.accordion-header:hover{color:#666}
+#sucursales-table-container a:hover{background:#0f5259!important}
+@media(max-width:768px){
+  #sucursales-table-container table{font-size:.9em}
+  #sucursales-table-container th,#sucursales-table-container td{padding:10px 8px}
+  #sucursales-table-container a{padding:6px 10px;font-size:13px}
+}
+</style>
+{% endif %}
+
+{% schema %}
+{"name":"Sucursales","tag":"div","settings":[]}
+{% endschema %}

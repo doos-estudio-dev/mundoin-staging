@@ -1,0 +1,314 @@
+
+<div
+id="page-sucursales"
+class="twl-relative twl-w-screen twl-flex twl-flex-col twl-items-center twl-justify-center"
+>
+<div
+  class="twl-relative twl-max-w-[1250px] twl-w-full twl-bg-slate-100 twl-scroll-smooth twl-min-h-4 twl-flex twl-justify-between twl-flex-nowrap twl-flex-row twl-gap-x-3 twl-py-5"
+>
+  <button
+    onclick="onScrollX(this)"
+    id="l"
+    class="twl-cursor-pointer twl-h-[200px] twl-min-w-[50px] twl-z-50 twl-bg-slate-600/10 twl-flex twl-justify-center twl-items-center"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="30"
+      viewBox="0 0 320 512"
+    >
+      <path
+        class="twl-opacity-80"
+        fill="#FFF"
+        d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"
+      />
+    </svg>
+  </button>
+
+  <div
+    id="sucursales-container"
+    class="twl-absolute twl-max-w-[1250px] twl-scroll-smooth twl-px-4 twl-w-full twl-overflow-x-scroll twl-flex twl-gap-x-4 twl-flex-row twl-flex-nowrap"
+  >
+    <button
+      onclick="onSelect(this)"
+      id="tlapan"
+      class="twl-relative twl-h-[200px] twl-min-w-[350px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/TLALPAN_1_63f1177e-f2ce-4134-b057-9727af9ca800.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">CDMX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Benito Juárez</p>
+        </div>
+      </div>
+    </button>
+    <button
+      onclick="onSelect(this)"
+      id="tlapan2"
+      class="twl-relative twl-h-[200px] twl-min-w-[350px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/TLALPAN_2_3fca051c-8d7c-4eac-85ad-9248c41d6f87.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">CDMX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Coyoacán</p>
+        </div>
+      </div>
+    </button>
+    <button
+      onclick="onSelect(this)"
+      id="vallejo"
+      class="twl-relative twl-h-[200px] twl-min-w-[350px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/VALLEJO.jpg?v=1721236626"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">CDMX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Vallejo</p>
+        </div>
+      </div>
+    </button>
+    <button
+      onclick="onSelect(this)"
+      id="centro"
+      class="twl-relative twl-h-[200px] twl-min-w-[350px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/CENTRO.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">CDMX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Centro</p>
+        </div>
+      </div>
+    </button>
+    <button
+      onclick="onSelect(this)"
+      id="naucalpan"
+      class="twl-relative twl-min-w-[350px] twl-h-[200px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/NAUCALPAN_9d3b484e-cf08-4998-b5c1-90bdaa8c1634.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">EDOMEX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Naucalpan</p>
+        </div>
+      </div>
+    </button>
+    <button
+      id="gustavo"
+      onclick="onSelect(this)"
+      class="twl-relative twl-min-w-[350px] twl-cursor-pointer twl-h-[200px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/GUSTAVO_BAZ.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">EDOMEX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Gustavo Baz</p>
+        </div>
+      </div>
+    </button>
+    <button
+      id="toluca"
+      onclick="onSelect(this)"
+      class="twl-relative twl-min-w-[350px] twl-cursor-pointer twl-h-[200px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/TOLUCA_7c4523ef-c804-4f93-a082-c5dd4be0cea1.jpg?v=1721236626"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">EDOMEX</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Toluca</p>
+        </div>
+      </div>
+    </button>
+    <button
+      id="puebla"
+      onclick="onSelect(this)"
+      class="twl-relative twl-min-w-[350px] twl-cursor-pointer twl-h-[200px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/PUEBLA.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">PUE</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Puebla</p>
+        </div>
+      </div>
+    </button>
+    <button
+      id="queretaro"
+      onclick="onSelect(this)"
+      class="twl-relative twl-min-w-[350px] twl-cursor-pointer twl-h-[200px] twl-max-w-[350px] twl-w-full"
+    >
+      <img
+        class="twl-object-cover twl-rounded-xl twl-object-left-bottom hover:twl-opacity-100 twl-h-[200px] twl-absolute twl-top-0 twl-opacity-90"
+        src="https://cdn.shopify.com/s/files/1/1233/2374/files/QRO.jpg?v=1721236625"
+        alt="Foto principal"
+        loading="lazy"
+      />
+      <div
+        class="twl-absolute twl-bottom-0 twl-right-1 twl-px-4 twl-py-4 twl-text-white twl-font-bold"
+      >
+        <h2 class="twl-text-xs twl-text-right">QRO</h2>
+        <div class="twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+          <p class="twl-text-xl"> Ver sucursal Querétaro</p>
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <button
+    role="button"
+    onclick="onScrollX(this)"
+    id="r"
+    class="twl-cursor-pointer twl-h-[200px] twl-min-w-[50px] twl-z-50 twl-bg-slate-600/10 twl-flex twl-justify-center twl-items-center"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="30"
+      viewBox="0 0 320 512"
+    >
+      <path
+        class="twl-opacity-80"
+        fill="#fff"
+        d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
+      />
+    </svg>
+  </button>
+</div>
+
+<div class="twl-hidden" id="info-sucursal-container">
+  <div class="twl-flex twl-justify-center twl-py-1">
+    <h2
+      class="twl-bg-slate-900 twl-px-3 twl-py-1 twl-rounded-lg twl-text-white twl-font-bold twl-text-2xl"
+      id="name-sucursal" style="color: #fff !important; background: rgb(239 117 103) !important;"
+    >
+      Testing
+    </h2>
+  </div>
+
+  <div class="twl-flex twl-justify-center">
+    <div
+      class="twl-max-w-[1250px] twl-grid twl-grid-cols-1 lg:twl-grid-cols-5 twl-w-full twl-min-h-3"
+    >
+      <div
+        class="twl-px-4 twl-flex twl-flex-col lg:twl-col-span-2 twl-gap-y-2 twl-justify-center"
+      >
+        <p><b>Dirección:</b> <span id="sucursal-direccion"></span></p>
+        <p><b>Horario:</b> <span id="sucursal-horario"></span></p>
+        <p><b>Contacto:</b> <span id="sucursal-contacto"></span></p>
+        <div id="tour-container" style="display: none;" class="twl-flex twl-justify-center twl-m-4">
+          <div style="width: fit-content;" class="twl-flex twl-bg-primary twl-px-3 twl-py-1 twl-rounded-xl">
+            <a id="tour-link" target="_blank" style="text-decoration: none;" href="#" class="twl-text-xl twl-font-bold twl-text-white">Ver recorrido 3D</a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="twl-m-4 lg:twl-col-span-3 twl-max-h-72 twl-rounded-xl"
+        id="sucursal-map"
+      ></div>
+    </div>
+  </div>
+
+  <div class="twl-flex twl-justify-center">
+    <div
+      class="twl-max-w-[1250px] twl-flex twl-items-center twl-justify-center twl-w-full twl-min-h-3"
+    >
+      <fieldset>
+        <label
+          class="no-border"
+          id="label-1"
+          style="
+            --_img: url(https://cdn.shopify.com/s/files/1/1233/2374/files/MUNDOIN_PATTERN01_1.png?v=1668748705);
+          "
+        >
+          <input class="no-border" type="radio" name="images" value="Fiddle Leaf" />
+        </label>
+        <label
+          class="no-border"
+          id="label-2"
+          style="
+            --_img: url(https://cdn.shopify.com/s/files/1/1233/2374/files/MUNDOIN_PATTERN01_1.png?v=1668748705);
+          "
+        >
+          <input class="no-border" type="radio" name="images" value="Pink Princess" />
+        </label>
+        <label
+          class="no-border"
+          id="label-3"
+          style="
+            --_img: url(https://cdn.shopify.com/s/files/1/1233/2374/files/MUNDOIN_PATTERN01_1.png?v=1668748705);
+          "
+        >
+          <input class="no-border" type="radio" name="images" value="Monstera" checked />
+        </label>
+      </fieldset>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="{{ 'sucursales.js' | asset_url }}" defer></script>
+<link rel="stylesheet" href="{{ 'sucursales.css' | asset_url }}">
+
+{% schema %}
+{
+  "name": "Sucursales",
+  "tag": "section",
+  "class": "section-sucursales",
+  "settings": []
+}
+{% endschema %}

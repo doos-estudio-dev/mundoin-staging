@@ -1,0 +1,360 @@
+{% style %}
+  .container-form-b2b {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .form-b2b {
+    max-width: 700px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    gap: 20px;
+  }
+
+  .form-b2b h2 {
+    color: #333;
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .form-b2b .form-field {
+    width: 100%;
+    position: relative;
+  }
+
+  .form-b2b .form-field-title {
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .form-b2b .form-field-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    background: white;
+    font-family: inherit;
+  }
+
+  .form-b2b .form-field-input:focus {
+    outline: none;
+    border-color: #145b5d;
+  }
+
+  .form-b2b select.form-field-input {
+    cursor: pointer;
+  }
+
+  .form-b2b .form-field-textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .form-b2b button[type="submit"] {
+    width: 100%;
+    max-width: 250px;
+    padding: 14px 28px;
+    background: #145b5d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+  }
+
+  .form-b2b button[type="submit"]:hover {
+    background: #0f4647;
+  }
+
+  .form-disclaimer {
+    max-width: 500px;
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 4px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .container-form-b2b {
+      padding: 20px 15px;
+    }
+    .form-b2b {
+      padding: 20px 15px;
+    }
+    .form-b2b h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .form-columns {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  @media screen and (max-width: 600px) {
+    .form-columns {
+      flex-direction: column;
+    }
+  }
+
+  .hidden {
+    display: none !important;
+  }
+{% endstyle %}
+
+{% form 'contact' %}
+  {{ form.errors | default_errors }}
+  <div class="container-form-b2b">
+    <div class="form-b2b">
+      <h1>Formulario de facturación Mundo In</h1>
+      <!-- RFC -->
+      <div class="form-field">
+        <label class="form-field-title" for="rfc">RFC</label>
+        <input
+          autocomplete="off"
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[rfc]"
+          id="rfc"
+          type="text"
+          aria-label="RFC">
+      </div>
+      <!-- Nombre -->
+      <div class="form-field">
+        <label class="form-field-title" for="nombre">Nombre</label>
+        <input
+          autocomplete="off"
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[nombre]"
+          id="nombre"
+          type="text"
+          aria-label="Nombre">
+      </div>
+      <!-- Regimen fiscal -->
+      <div class="form-field">
+        <label class="form-field-title" for="regimen">Régimen fiscal</label>
+        <select
+          class="custom-b2b form-field-input form-field-text"
+          id="regimen"
+          name="contact[regimen]">
+          <option selected></option>
+          <option>Régimen Simplificado de Confianza</option>
+          <option>Sueldos y salarios e ingresos asimilados a salarios</option>
+          <option>Régimen de Actividades Empresariales y Profesionales</option>
+          <option>Régimen de Incorporación Fiscal</option>
+          <option>General de Ley Personas Morales</option>
+          <option>Enajenación de bienes</option>
+          <option>Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
+          <option>Régimen de Arrendamiento</option>
+          <option>Intereses</option>
+          <option>Obtención de premios</option>
+          <option>Dividendos</option>
+          <option>Demás ingresos</option>
+        </select>
+      </div>
+      <!-- Código postal -->
+      <div class="form-field">
+        <label class="form-field-title" for="codigo_postal">Código postal</label>
+        <input
+          autocomplete="off"
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[codigo_postal]"
+          id="codigo_postal"
+          type="text"
+          aria-label="Código postal">
+      </div>
+      <!-- Estado -->
+      <div class="form-field">
+        <label class="form-field-title" for="estado">Estado</label>
+        <select
+          class="custom-b2b form-field-input form-field-text"
+          id="estado"
+          name="contact[estado]">
+          <option selected></option>
+          <option>Aguascalientes</option>
+          <option>Baja California</option>
+          <option>Baja California Sur</option>
+          <option>Campeche</option>
+          <option>Chiapas</option>
+          <option>Chihuahua</option>
+          <option>Ciudad de México</option>
+          <option>Coahuila</option>
+          <option>Colima</option>
+          <option>Durango</option>
+          <option>Estado de México</option>
+          <option>Guanajuato</option>
+          <option>Guerrero</option>
+          <option>Hidalgo</option>
+          <option>Jalisco</option>
+          <option>Michoacán</option>
+          <option>Morelos</option>
+          <option>Nayarit</option>
+          <option>Nuevo León</option>
+          <option>Oaxaca</option>
+          <option>Puebla</option>
+          <option>Querétaro</option>
+          <option>Quintana Roo</option>
+          <option>San Luis Potosí</option>
+          <option>Sinaloa</option>
+          <option>Sonora</option>
+          <option>Tabasco</option>
+          <option>Tamaulipas</option>
+          <option>Tlaxcala</option>
+          <option>Veracruz</option>
+          <option>Yucatán</option>
+          <option>Zacatecas</option>
+        </select>
+      </div>
+      <!-- Localidad -->
+      <div class="form-field">
+        <label class="form-field-title" for="localidad">Localidad / Alcaldía</label>
+        <input
+          autocomplete="off"
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[localidad]"
+          id="localidad"
+          type="text"
+          aria-label="Localidad">
+      </div>
+      <!-- Uso de CFDI -->
+      <div class="form-field">
+        <label class="form-field-title" for="uso_cfdi">Uso del CFDI</label>
+        <select
+          class="custom-b2b form-field-input form-field-text"
+          id="uso_cfdi"
+          name="contact[uso_cfdi]">
+          <option selected></option>
+          <option>G01 - Adquisición de mercancías.</option>
+          <option>G02 - Devoluciones, descuentos o bonificaciones.</option>
+          <option>G03 - Gastos en general.</option>
+          <option>I01 - Construcciones.</option>
+          <option>I02 - Mobiliario y equipo de oficina por inversiones.</option>
+          <option>I03 - Equipo de transporte.</option>
+          <option>I04 - Equipo de computo y accesorios.</option>
+          <option>I05 - Dados, troqueles, moldes, matrices y herramental.</option>
+          <option>I06 - Comunicaciones telefónicas.</option>
+          <option>I07 - Comunicaciones satelitales.</option>
+          <option>I08 - Otra maquinaria y equipo.</option>
+          <option>D01 - Honorarios médicos, dentales y gastos hospitalarios.</option>
+          <option>D02 - Gastos médicos por incapacidad o discapacidad.</option>
+          <option>D03 - Gastos funerales.</option>
+          <option>D04 - Donativos.</option>
+          <option>D05 - Intereses reales efectivamente pagados por créditos hipotecarios (casa habitación).</option>
+          <option>D06 - Aportaciones voluntarias al SAR.</option>
+          <option>D07 - Primas por seguros de gastos médicos.</option>
+          <option>D08 - Gastos de transportación escolar obligatoria.</option>
+          <option>D09 - Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones.</option>
+          <option>D10 - Pagos por servicios educativos (colegiaturas).</option>
+          <option>S01 - Sin efectos fiscales.</option>
+          <option>CP01 - Pagos</option>
+          <option>CN01 - Nómina</option>
+        </select>
+      </div>
+      <!-- Forma de pago -->
+      <div class="form-field">
+        <label class="form-field-title" for="forma_pago">Forma de pago</label>
+        <select
+          class="custom-b2b form-field-input form-field-text"
+          id="forma_pago"
+          name="contact[forma_pago]">
+          <option selected></option>
+          <option>Tarjeta de débito</option>
+          <option>Tarjeta de crédito</option>
+          <option>Transferencia electrónica</option>
+        </select>
+      </div>
+      <!-- Número de pedido -->
+      <div class="form-field">
+        <label class="form-field-title" for="pedido">Número de pedido</label>
+        <input
+          autocomplete="off"
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[pedido]"
+          id="pedido"
+          type="text"
+          aria-label="Número de pedido">
+      </div>
+      <!-- Plataforma de compra -->
+      <div class="form-field">
+        <label class="form-field-title" for="plataforma">Plataforma de compra</label>
+        <select
+          class="custom-b2b form-field-input form-field-text"
+          id="plataforma"
+          name="contact[plataforma]">
+          <option selected></option>
+          <option>Mercado Libre</option>
+          <option>Amazon</option>
+          <option>Página web</option>
+          <option>Otra</option>
+        </select>
+      </div>
+      <!-- Correo -->
+      <div class="form-field">
+        <label class="form-field-title" for="email_in">Correo electrónico</label>
+        <input
+          autocomplete="off"
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[email]"
+          id="email_in"
+          type="email"
+          required
+          aria-label="Correo electrónico">
+      </div>
+      <!-- Celular -->
+      <div class="form-field">
+        <label class="form-field-title" for="celular">Teléfono de contacto</label>
+        <input
+          class="custom-b2b form-field-input form-field-text"
+          name="contact[celular]"
+          id="celular"
+          required
+          type="tel"
+          aria-label="Teléfono de contacto">
+      </div>
+      <!-- Notas -->
+      <div class="form-field">
+        <label class="form-field-title" for="notas">Notas</label>
+        <textarea
+          class="custom-b2b form-field-input form-field-textarea"
+          id="notas"
+          name="contact[notas]"></textarea>
+      </div>
+
+      <!-- Required for form but hidden -->
+      <div style="display: hidden;">
+        <input
+          type="hidden"
+          name="contact[body]"
+          id="body">
+      </div>
+
+      <div class="form-disclaimer">
+        La factura será enviada al correo que se proporcionó en un plazo máximo de 7 días hábiles
+      </div>
+
+      <div>
+        <button class="button-primary mdc-ripple-surface mdc-ripple-upgraded" type="submit">Enviar</button>
+      </div>
+    </div>
+  </div>
+{% endform %}

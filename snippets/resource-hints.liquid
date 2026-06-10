@@ -1,0 +1,15 @@
+{% comment %}
+  Resource hints for third-party domains
+  Improves connection time to external resources
+{% endcomment %}
+
+{%- comment -%} Preconnect to Google Tag Manager {%- endcomment -%}
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+{%- comment -%} Preconnect to Klaviyo {%- endcomment -%}
+<link rel="preconnect" href="https://a.klaviyo.com" crossorigin>
+<link rel="dns-prefetch" href="https://a.klaviyo.com">
+
+{%- comment -%} DNS prefetch for Shopify CDN {%- endcomment -%}
+<link rel="dns-prefetch" href="https://cdn.shopify.com">

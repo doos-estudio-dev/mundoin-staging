@@ -1,0 +1,96 @@
+{% comment %}
+  Defer all third-party scripts until after page load
+  This dramatically improves FCP and LCP by delaying non-critical scripts
+{% endcomment %}
+
+<script>
+(function() {
+  'use strict';
+
+  // Lista de terceros a diferir (dominios o palabras clave)
+  const THIRD_PARTY_PATTERNS = [
+    'loox.io',
+    'wishlisthero',
+    'swym',
+    'clarity.ms',
+    'triplepixel',
+    'facebook.net',
+    'google-analytics',
+    'googletagmanager',
+    'klaviyo',
+    'hcaptcha',
+    'tiktok',
+    'pinterest',
+    'snapchat',
+    'analytics'
+  ];
+
+  // Función para detectar si un script es de terceros
+  function isThirdPartyScript(src) {
+    if (!src) return false;
+    return THIRD_PARTY_PATTERNS.some(pattern => src.includes(pattern));
+  }
+
+  // Interceptar la creación de scripts
+  const originalCreateElement = document.createElement.bind(document);
+  document.createElement = function(tagName) {
+    const element = originalCreateElement(tagName);
+
+    if (tagName.toLowerCase() === 'script') {
+      const originalSetAttribute = element.setAttribute.bind(element);
+
+      element.setAttribute = function(name, value) {
+        // Si es src y es de tercero, retrasar
+        if (name === 'src' && isThirdPartyScript(value)) {
+          element.dataset.deferredSrc = value;
+          element.dataset.thirdParty = 'true';
+          return; // No setear src todavía
+        }
+        return originalSetAttribute(name, value);
+      };
+
+      // Interceptar asignación directa de src
+      Object.defineProperty(element, 'src', {
+        get() {
+          return element.dataset.deferredSrc || '';
+        },
+        set(value) {
+          if (isThirdPartyScript(value)) {
+            element.dataset.deferredSrc = value;
+            element.dataset.thirdParty = 'true';
+          } else {
+            originalSetAttribute('src', value);
+          }
+        }
+      });
+    }
+
+    return element;
+  };
+
+  // Cargar scripts diferidos después del load
+  function loadDeferredScripts() {
+    const deferredScripts = document.querySelectorAll('script[data-third-party="true"]');
+
+    deferredScripts.forEach((script, index) => {
+      setTimeout(() => {
+        const src = script.dataset.deferredSrc;
+        if (src) {
+          script.removeAttribute('data-deferred-src');
+          script.removeAttribute('data-third-party');
+          script.setAttribute('src', src);
+        }
+      }, index * 100); // Escalonar carga
+    });
+  }
+
+  // Ejecutar después de que la página esté completamente cargada
+  if (document.readyState === 'complete') {
+    loadDeferredScripts();
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(loadDeferredScripts, 1000); // 1 segundo después del load
+    });
+  }
+})();
+</script>

@@ -1,0 +1,122 @@
+{{ 'page-megasale.css' | asset_url | stylesheet_tag }}
+
+<script>
+(function() {
+  'use strict';
+
+  function fixImages() {
+    const images = document.querySelectorAll('.resource-list img[loading="lazy"]');
+    images.forEach((img) => {
+      if (img.loading === 'lazy') {
+        img.loading = 'eager';
+      }
+    });
+  }
+
+  function enableCarousels() {
+    const slideshows = document.querySelectorAll('slideshow-component[disabled]');
+    slideshows.forEach((slideshow) => {
+      slideshow.removeAttribute('disabled');
+      if (slideshow.connectedCallback) {
+        try {
+          slideshow.connectedCallback();
+        } catch (e) {
+          // console.warn('[Megasale] Error reconectando carrusel:', e);
+        }
+      }
+    });
+  }
+
+  function initializeProductCardCarousels() {
+    const slideshows = document.querySelectorAll('slideshow-component');
+
+    slideshows.forEach((slideshow) => {
+      const isInCardGallery = slideshow.closest('.card-gallery') !== null;
+      if (!isInCardGallery) return;
+
+      const slides = slideshow.querySelectorAll('slideshow-slide:not([hidden])');
+      if (slides.length <= 1) return;
+
+      const scroller = slideshow.querySelector('slideshow-slides');
+      const arrowsContainer = slideshow.querySelector('slideshow-arrows');
+      const prevButton = arrowsContainer?.querySelector('button[ref="previous"]');
+      const nextButton = arrowsContainer?.querySelector('button[ref="next"]');
+
+      if (prevButton && nextButton && scroller) {
+        prevButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const currentIndex = Array.from(slides).findIndex(s =>
+            s.getBoundingClientRect().left >= scroller.getBoundingClientRect().left - 1
+          );
+
+          if (currentIndex > 0) {
+            slides[currentIndex - 1].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+          }
+        }, true);
+
+        nextButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const currentIndex = Array.from(slides).findIndex(s =>
+            s.getBoundingClientRect().left >= scroller.getBoundingClientRect().left - 1
+          );
+
+          if (currentIndex < slides.length - 1) {
+            slides[currentIndex + 1].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+          }
+        }, true);
+      }
+    });
+  }
+
+  function makeImagesClickable() {
+    const galleries = document.querySelectorAll('.card-gallery');
+
+    galleries.forEach(function(gallery) {
+      gallery.addEventListener('click', function(e) {
+        // Solo si el click es en la imagen, no en botones u otros elementos
+        const isButton = e.target.closest('button');
+        const isLink = e.target.closest('a:not(.product-card__link)');
+        const isInput = e.target.closest('input');
+
+        if (isButton || isLink || isInput) {
+          return; // Dejar que funcionen normalmente
+        }
+
+        // Buscar el enlace de la card
+        const productCard = gallery.closest('product-card');
+        const productLink = productCard?.querySelector('.product-card__link');
+
+        if (productLink && productLink.href) {
+          window.location.href = productLink.href;
+        }
+      });
+    });
+  }
+
+  function initialize() {
+    setTimeout(function() {
+      fixImages();
+      enableCarousels();
+      makeImagesClickable();
+      // initializeProductCardCarousels(); // Deshabilitado - las flechas están ocultas
+    }, 500);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize);
+  } else {
+    initialize();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Megasale Styles",
+  "settings": []
+}
+{% endschema %}
