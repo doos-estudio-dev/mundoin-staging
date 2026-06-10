@@ -5,9 +5,13 @@
       background-color: {{ section.settings.desktop_bg_color }};
       overflow: hidden;
     }
-    #home-{{ section.id }} .slide-desktop img {
+    #home-{{ section.id }} .slide-desktop img,
+    #home-{{ section.id }} .slide-desktop picture {
+      display: block;
       width: 100%;
       height: 100%;
+    }
+    #home-{{ section.id }} .slide-desktop img {
       object-fit: {{ section.settings.desktop_fit }};
       object-position: center;
     }
@@ -21,6 +25,16 @@
       height: 100%;
       object-fit: {{ section.settings.mobile_fit }};
       object-position: center;
+    }
+    {% if section.settings.unified_carousel %}
+      #home-{{ section.id }} .banner-deskt { display: block !important; }
+      #home-{{ section.id }} .bannr-movil  { display: none  !important; }
+    {% endif %}
+    @media (max-width: 768px) {
+      #home-{{ section.id }} .slide-desktop.slide-has-mobile img {
+        object-fit: contain !important;
+        object-position: center !important;
+      }
     }
   </style>
 
@@ -42,14 +56,29 @@
             {% if slide_fit == blank %}{% assign slide_fit = section.settings.desktop_fit %}{% endif %}
             {% assign slide_pos = block.settings.slide_position | default: 'center' %}
             {% assign img_style = 'object-fit: ' | append: slide_fit | append: '; object-position: ' | append: slide_pos | append: '; width: 100%; height: 100%;' %}
-            <a class="slide-desktop" href="{{ block.settings.link | default: '#' }}"
+            {% assign has_mobile_img = false %}
+            {% if block.settings.image_mobile != blank %}{% assign has_mobile_img = true %}{% endif %}
+            <a class="slide-desktop{% if has_mobile_img %} slide-has-mobile{% endif %}"
+              href="{{ block.settings.link | default: '#' }}"
               {% if block.settings.slide_height > 0 %}style="height: {{ block.settings.slide_height }}px;"{% endif %}
               {{ block.shopify_attributes }}>
-              {{
-                block.settings.image
-                | image_url: width: 2400
-                | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '(max-width: 768px) 1px, 100vw', style: img_style
-              }}
+              {% if has_mobile_img %}
+                {% capture mobile_srcset %}{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 550 }} 550w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 828 }} 828w{% endcapture %}
+                <picture>
+                  <source media="(max-width: 768px)" srcset="{{ mobile_srcset }}" sizes="100vw">
+                  {{
+                    block.settings.image
+                    | image_url: width: 2400
+                    | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw', style: img_style
+                  }}
+                </picture>
+              {% else %}
+                {{
+                  block.settings.image
+                  | image_url: width: 2400
+                  | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '(max-width: 768px) 1px, 100vw', style: img_style
+                }}
+              {% endif %}
             </a>
           {% endif %}
         {% endfor %}
@@ -379,6 +408,17 @@
     },
     {
       "type": "header",
+      "content": "Responsive"
+    },
+    {
+      "type": "checkbox",
+      "id": "unified_carousel",
+      "label": "Carrusel unificado (desktop + móvil)",
+      "default": false,
+      "info": "Activa cuando cada Desktop slide tenga su propia imagen móvil. Oculta el carrusel móvil separado y muestra el desktop en todas las pantallas."
+    },
+    {
+      "type": "header",
       "content": "FAQ"
     },
     {
@@ -430,6 +470,13 @@
             { "value": "right center", "label": "Derecha" }
           ],
           "default": "center"
+        },
+        { "type": "header", "content": "Imagen móvil" },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Imagen para móvil (opcional)",
+          "info": "Se muestra en pantallas ≤768px sin recorte. Activa 'Carrusel unificado' en la sección para que este carrusel también sea visible en móvil."
         }
       ]
     },
