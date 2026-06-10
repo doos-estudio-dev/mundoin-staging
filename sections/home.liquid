@@ -1,4 +1,29 @@
 {% comment %} ---- SECCIÓN DEL BANNER CARRUSEL ---- {% endcomment %}
+  <style>
+    #home-{{ section.id }} .slide-desktop {
+      height: {{ section.settings.desktop_height }}px;
+      background-color: {{ section.settings.desktop_bg_color }};
+      overflow: hidden;
+    }
+    #home-{{ section.id }} .slide-desktop img {
+      width: 100%;
+      height: 100%;
+      object-fit: {{ section.settings.desktop_fit }};
+      object-position: center;
+    }
+    #home-{{ section.id }} .slide-mobile {
+      height: {{ section.settings.mobile_height }}px;
+      background-color: {{ section.settings.mobile_bg_color }};
+      overflow: hidden;
+    }
+    #home-{{ section.id }} .slide-mobile img {
+      width: 100%;
+      height: 100%;
+      object-fit: {{ section.settings.mobile_fit }};
+      object-position: center;
+    }
+  </style>
+
   <section class="new-banner" id="home-{{ section.id }}">
     <div class="banner-deskt carousel-wrapper">
       <div class="element-banner-deskt">
@@ -285,6 +310,77 @@
 {
   "name": "Home",
   "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner Desktop"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Altura (px)",
+      "min": 200,
+      "max": 900,
+      "step": 10,
+      "default": 550
+    },
+    {
+      "type": "select",
+      "id": "desktop_fit",
+      "label": "Ajuste de imagen",
+      "options": [
+        { "value": "cover", "label": "Rellenar (puede recortar)" },
+        { "value": "contain", "label": "Contener (sin recorte)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "color",
+      "id": "desktop_bg_color",
+      "label": "Color de fondo desktop",
+      "default": "#f5f5f5",
+      "info": "Visible solo cuando el ajuste es 'Contener'"
+    },
+    {
+      "type": "header",
+      "content": "Banner Mobile"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Altura (px)",
+      "min": 150,
+      "max": 700,
+      "step": 10,
+      "default": 400
+    },
+    {
+      "type": "select",
+      "id": "mobile_fit",
+      "label": "Ajuste de imagen",
+      "options": [
+        { "value": "contain", "label": "Contener (sin recorte)" },
+        { "value": "cover", "label": "Rellenar (puede recortar)" }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "color",
+      "id": "mobile_bg_color",
+      "label": "Color de fondo mobile",
+      "default": "#ffffff",
+      "info": "Visible cuando el ajuste es 'Contener'"
+    },
+    {
+      "type": "header",
+      "content": "FAQ"
+    },
+    {
+      "type": "text",
+      "id": "faq_title",
+      "label": "Título sección FAQ"
+    }
+  ],
   "blocks": [
     {
       "type": "desktop_slide",
