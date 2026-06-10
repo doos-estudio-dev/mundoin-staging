@@ -360,7 +360,6 @@
         "mobile_height": 400,
         "mobile_fit": "contain",
         "mobile_bg_color": "#ffffff",
-        "unified_carousel": false,
         "faq_title": ""
       }
     },
