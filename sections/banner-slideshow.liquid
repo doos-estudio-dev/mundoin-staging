@@ -1,0 +1,442 @@
+{% assign sid = 'bsw-' | append: section.id %}
+
+<style>
+  /* ─── Container ───────────────────────────────────────────────── */
+  #{{ sid }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: {{ section.settings.desktop_bg_color }};
+  }
+
+  /* ─── Track ──────────────────────────────────────────────────── */
+  #{{ sid }} .bsw__track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+
+  /* ─── Slide ──────────────────────────────────────────────────── */
+  #{{ sid }} .bsw__slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    position: relative;
+    height: {{ section.settings.desktop_height }}px;
+    overflow: hidden;
+    background-color: {{ section.settings.desktop_bg_color }};
+  }
+
+  #{{ sid }} .bsw__link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  #{{ sid }} .bsw__slide picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #{{ sid }} .bsw__slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ section.settings.desktop_fit }};
+    object-position: center;
+  }
+
+  /* ─── Placeholder (no image set) ─────────────────────────────── */
+  #{{ sid }} .bsw__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #e8e8e8;
+    gap: 12px;
+    color: #999;
+    font-size: 0.9rem;
+    font-family: sans-serif;
+  }
+  #{{ sid }} .bsw__placeholder svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.25;
+  }
+  #{{ sid }} .bsw__placeholder span {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+
+  /* ─── Arrows ─────────────────────────────────────────────────── */
+  #{{ sid }} .bsw__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.85);
+    border: none;
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s ease, transform 0.2s ease;
+    padding: 0;
+  }
+  #{{ sid }} .bsw__arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.08);
+  }
+  #{{ sid }} .bsw__arrow svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: #222;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  #{{ sid }} .bsw__arrow--prev { left: 1.25rem; }
+  #{{ sid }} .bsw__arrow--next { right: 1.25rem; }
+
+  /* ─── Dots ───────────────────────────────────────────────────── */
+  #{{ sid }} .bsw__dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+  #{{ sid }} .bsw__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.25s, transform 0.25s;
+  }
+  #{{ sid }} .bsw__dot.is-active {
+    background: #fff;
+    transform: scale(1.4);
+  }
+
+  /* ─── Mobile ─────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    #{{ sid }} .bsw__slide {
+      height: {{ section.settings.mobile_height }}px;
+      background-color: {{ section.settings.mobile_bg_color }};
+    }
+    #{{ sid }} .bsw__slide img {
+      object-fit: {{ section.settings.mobile_fit }};
+    }
+    #{{ sid }} .bsw__arrow {
+      width: 40px;
+      height: 40px;
+    }
+    #{{ sid }} .bsw__arrow svg {
+      width: 17px;
+      height: 17px;
+    }
+    #{{ sid }} .bsw__arrow--prev { left: 0.6rem; }
+    #{{ sid }} .bsw__arrow--next { right: 0.6rem; }
+    #{{ sid }} .bsw__dots { bottom: 0.6rem; }
+  }
+</style>
+
+<section id="{{ sid }}" class="banner-slideshow" aria-label="Carrusel de imágenes">
+
+  <div class="bsw__track" aria-live="polite">
+    {% for block in section.blocks %}
+      {% assign loading_attr = 'lazy' %}
+      {% assign fetch_attr   = 'auto' %}
+      {% if forloop.first %}
+        {% assign loading_attr = 'eager' %}
+        {% assign fetch_attr   = 'high' %}
+      {% endif %}
+      {% assign alt_d = block.settings.alt_text | default: 'Slide' %}
+      {% assign slide_label = 'Slide ' | append: forloop.index | append: ' de ' | append: section.blocks.size %}
+
+      <div class="bsw__slide" {{ block.shopify_attributes }}
+           role="group" aria-label="{{ slide_label }}">
+
+        {% if block.settings.link != blank %}
+          <a class="bsw__link" href="{{ block.settings.link }}">
+        {% endif %}
+
+        {% if block.settings.image != blank %}
+          {% if block.settings.image_mobile != blank %}
+            {% capture mob_srcset %}{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 550 }} 550w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 828 }} 828w{% endcapture %}
+            <picture>
+              <source media="(max-width: 768px)" srcset="{{ mob_srcset }}" sizes="100vw">
+              {{
+                block.settings.image
+                | image_url: width: 2400
+                | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr,
+                  decoding: 'async', widths: '750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw'
+              }}
+            </picture>
+          {% else %}
+            {{
+              block.settings.image
+              | image_url: width: 2400
+              | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr,
+                decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw'
+            }}
+          {% endif %}
+        {% else %}
+          <div class="bsw__placeholder">
+            {{ 'image' | placeholder_svg_tag }}
+            <span>Desktop: 1920 × {{ section.settings.desktop_height }} px &nbsp;|&nbsp; Móvil: 750 × {{ section.settings.mobile_height }} px</span>
+          </div>
+        {% endif %}
+
+        {% if block.settings.link != blank %}
+          </a>
+        {% endif %}
+
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if section.blocks.size > 1 %}
+    {% if section.settings.show_arrows %}
+      <button class="bsw__arrow bsw__arrow--prev" type="button" aria-label="Slide anterior">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="bsw__arrow bsw__arrow--next" type="button" aria-label="Slide siguiente">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    {% endif %}
+
+    {% if section.settings.show_dots %}
+      <div class="bsw__dots" role="tablist" aria-label="Navegación de slides">
+        {% for block in section.blocks %}
+          <button class="bsw__dot{% if forloop.first %} is-active{% endif %}"
+            type="button" role="tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            aria-label="Ir a slide {{ forloop.index }}">
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+
+</section>
+
+<script>
+(function () {
+  var root  = document.getElementById('{{ sid }}');
+  if (!root) return;
+
+  var track  = root.querySelector('.bsw__track');
+  var slides = track.querySelectorAll('.bsw__slide');
+  var total  = slides.length;
+  if (total <= 1) return;
+
+  var prevBtn = root.querySelector('.bsw__arrow--prev');
+  var nextBtn = root.querySelector('.bsw__arrow--next');
+  var dots    = Array.prototype.slice.call(root.querySelectorAll('.bsw__dot'));
+
+  var current   = 0;
+  var autoTimer = null;
+
+  function goTo(idx) {
+    current = ((idx % total) + total) % total;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach(function (d, i) {
+      d.classList.toggle('is-active', i === current);
+      d.setAttribute('aria-selected', String(i === current));
+    });
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
+  dots.forEach(function (d, i) { d.addEventListener('click', function () { goTo(i); }); });
+
+  {% if section.settings.autoplay %}
+  var delay = {{ section.settings.autoplay_speed | times: 1000 }};
+  function startAuto() { autoTimer = setInterval(function () { goTo(current + 1); }, delay); }
+  function stopAuto()  { clearInterval(autoTimer); }
+  startAuto();
+  root.addEventListener('mouseenter', stopAuto);
+  root.addEventListener('mouseleave', startAuto);
+  root.addEventListener('focusin',    stopAuto);
+  root.addEventListener('focusout',   startAuto);
+  {% endif %}
+
+  /* ── Swipe ── */
+  var touchX = 0;
+  track.addEventListener('touchstart', function (e) {
+    touchX = e.touches[0].clientX;
+  }, { passive: true });
+  track.addEventListener('touchend', function (e) {
+    var diff = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+  }, { passive: true });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Banner Slideshow",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Altura del banner"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Altura desktop (px)",
+      "min": 200,
+      "max": 900,
+      "step": 10,
+      "default": 600,
+      "info": "Dimensión recomendada de imagen: 1920 × [esta altura] px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Altura móvil (px)",
+      "min": 150,
+      "max": 800,
+      "step": 10,
+      "default": 450,
+      "info": "Dimensión recomendada de imagen: 750 × [esta altura] px"
+    },
+    {
+      "type": "header",
+      "content": "Ajuste de imagen desktop"
+    },
+    {
+      "type": "select",
+      "id": "desktop_fit",
+      "label": "Modo de ajuste",
+      "options": [
+        { "value": "cover",   "label": "Rellenar — imagen puede recortarse" },
+        { "value": "contain", "label": "Contener — imagen completa, sin recorte" }
+      ],
+      "default": "cover",
+      "info": "Con 'Contener', la imagen debe medir exactamente 1920 × [altura] px para no mostrar franjas"
+    },
+    {
+      "type": "color",
+      "id": "desktop_bg_color",
+      "label": "Color de fondo desktop",
+      "default": "#f5f5f5",
+      "info": "Visible con 'Contener' si la imagen no llena todo el espacio"
+    },
+    {
+      "type": "header",
+      "content": "Ajuste de imagen móvil"
+    },
+    {
+      "type": "select",
+      "id": "mobile_fit",
+      "label": "Modo de ajuste",
+      "options": [
+        { "value": "contain", "label": "Contener — imagen completa, sin recorte" },
+        { "value": "cover",   "label": "Rellenar — imagen puede recortarse" }
+      ],
+      "default": "contain",
+      "info": "Con 'Contener', la imagen debe medir exactamente 750 × [altura móvil] px para no mostrar franjas"
+    },
+    {
+      "type": "color",
+      "id": "mobile_bg_color",
+      "label": "Color de fondo móvil",
+      "default": "#ffffff",
+      "info": "Visible con 'Contener' si la imagen no llena todo el espacio"
+    },
+    {
+      "type": "header",
+      "content": "Controles de navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Mostrar puntos indicadores",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Autoplay"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Reproducción automática",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Velocidad (segundos por slide)",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 5,
+      "info": "Solo aplica si la reproducción automática está activada"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen desktop",
+          "info": "Rec. con Rellenar: 1920 × 600 px (o ajusta al alto configurado) — Rec. con Contener: exactamente 1920 × [altura] px"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Imagen móvil (opcional)",
+          "info": "Rec. con Rellenar: 750 × 450 px — Rec. con Contener: exactamente 750 × [altura móvil] px — si no se sube, se usa la imagen desktop"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Texto ALT (accesibilidad)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace al hacer clic (opcional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner Slideshow",
+      "category": "Imágenes",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
+}
+{% endschema %}
