@@ -9,6 +9,50 @@
  */
 {
   "sections": {
+    "banner_slideshow_QkcAiT": {
+      "type": "banner-slideshow",
+      "blocks": {
+        "slide_FETfxy": {
+          "type": "slide",
+          "settings": {
+            "alt_text": "",
+            "link": ""
+          }
+        },
+        "slide_bfnajB": {
+          "type": "slide",
+          "settings": {
+            "alt_text": "",
+            "link": ""
+          }
+        },
+        "slide_LK8tnq": {
+          "type": "slide",
+          "settings": {
+            "alt_text": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_FETfxy",
+        "slide_bfnajB",
+        "slide_LK8tnq"
+      ],
+      "name": "Banner Slideshow",
+      "settings": {
+        "desktop_height": 800,
+        "mobile_height": 450,
+        "desktop_fit": "cover",
+        "desktop_bg_color": "#f5f5f5",
+        "mobile_fit": "contain",
+        "mobile_bg_color": "#ffffff",
+        "show_arrows": true,
+        "show_dots": true,
+        "autoplay": false,
+        "autoplay_speed": 5
+      }
+    },
     "home_K8bixT": {
       "type": "home",
       "blocks": {
@@ -21,7 +65,8 @@
             "link": "shopify://collections/comedores",
             "slide_height": 0,
             "slide_fit": "contain",
-            "slide_position": "center"
+            "slide_position": "center",
+            "slide_image_width": "100%"
           }
         },
         "desktop_slide_agz47M": {
@@ -34,7 +79,8 @@
             "link": "shopify://collections/banner-2-promociones-mundo-in",
             "slide_height": 0,
             "slide_fit": "",
-            "slide_position": "center"
+            "slide_position": "center",
+            "slide_image_width": "100%"
           }
         },
         "desktop_slide_Ljzwjh": {
@@ -46,7 +92,8 @@
             "link": "shopify://collections/banner-3-promociones-mundo-in",
             "slide_height": 0,
             "slide_fit": "",
-            "slide_position": "center"
+            "slide_position": "center",
+            "slide_image_width": "100%"
           }
         },
         "mobile_slide_8JpMzC": {
@@ -360,6 +407,7 @@
         "mobile_height": 400,
         "mobile_fit": "contain",
         "mobile_bg_color": "#ffffff",
+        "unified_carousel": false,
         "faq_title": ""
       }
     },
@@ -376,6 +424,7 @@
     }
   },
   "order": [
+    "banner_slideshow_QkcAiT",
     "home_K8bixT",
     "klaviyo_form_GxgdLf"
   ]
