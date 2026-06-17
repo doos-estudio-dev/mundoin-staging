@@ -59,6 +59,7 @@
         "desktop_slide_X8qm8M": {
           "type": "desktop_slide",
           "name": "Desktop slide 1",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/BANNER-MAYO_2_c0a713d6-a00d-4e23-ac7f-a01c29bf72c8.jpg",
             "alt_text": "Productos Exterior",
@@ -86,6 +87,7 @@
         "desktop_slide_Ljzwjh": {
           "type": "desktop_slide",
           "name": "Desktop slide 3",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/BANNER3_1.jpg",
             "alt_text": "Banner desktop",
@@ -99,6 +101,7 @@
         "mobile_slide_8JpMzC": {
           "type": "mobile_slide",
           "name": "Mobile slide 1",
+          "disabled": true,
           "settings": {
             "image_m": "shopify://shop_images/BANNER-MAYO_MOB_2_3a8b38ce-ef0f-43e9-a015-5a641a18d504.jpg",
             "alt_text_m": "Banner mobile",
@@ -118,6 +121,7 @@
         "mobile_slide_UEL3gi": {
           "type": "mobile_slide",
           "name": "Mobile slide 3",
+          "disabled": true,
           "settings": {
             "image_m": "shopify://shop_images/BANNER3_MOB.jpg",
             "alt_text_m": "Banner mobile",
