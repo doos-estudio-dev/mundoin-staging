@@ -55,30 +55,34 @@
             {% assign slide_fit = block.settings.slide_fit | default: '' %}
             {% if slide_fit == blank %}{% assign slide_fit = section.settings.desktop_fit %}{% endif %}
             {% assign slide_pos = block.settings.slide_position | default: 'center' %}
+            {% assign slide_max_w = block.settings.slide_image_width | default: '100%' %}
             {% assign img_style = 'object-fit: ' | append: slide_fit | append: '; object-position: ' | append: slide_pos | append: '; width: 100%; height: 100%;' %}
+            {% assign wrap_style = 'max-width: ' | append: slide_max_w | append: '; margin: 0 auto; height: 100%;' %}
             {% assign has_mobile_img = false %}
             {% if block.settings.image_mobile != blank %}{% assign has_mobile_img = true %}{% endif %}
             <a class="slide-desktop{% if has_mobile_img %} slide-has-mobile{% endif %}"
               href="{{ block.settings.link | default: '#' }}"
               {% if block.settings.slide_height > 0 %}style="height: {{ block.settings.slide_height }}px;"{% endif %}
               {{ block.shopify_attributes }}>
-              {% if has_mobile_img %}
-                {% capture mobile_srcset %}{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 550 }} 550w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 828 }} 828w{% endcapture %}
-                <picture>
-                  <source media="(max-width: 768px)" srcset="{{ mobile_srcset }}" sizes="100vw">
+              <div style="{{ wrap_style }}">
+                {% if has_mobile_img %}
+                  {% capture mobile_srcset %}{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 550 }} 550w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 828 }} 828w{% endcapture %}
+                  <picture>
+                    <source media="(max-width: 768px)" srcset="{{ mobile_srcset }}" sizes="100vw">
+                    {{
+                      block.settings.image
+                      | image_url: width: 2400
+                      | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw', style: img_style
+                    }}
+                  </picture>
+                {% else %}
                   {{
                     block.settings.image
                     | image_url: width: 2400
-                    | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw', style: img_style
+                    | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '(max-width: 768px) 1px, 100vw', style: img_style
                   }}
-                </picture>
-              {% else %}
-                {{
-                  block.settings.image
-                  | image_url: width: 2400
-                  | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr, decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '(max-width: 768px) 1px, 100vw', style: img_style
-                }}
-              {% endif %}
+                {% endif %}
+              </div>
             </a>
           {% endif %}
         {% endfor %}
@@ -470,6 +474,20 @@
             { "value": "right center", "label": "Derecha" }
           ],
           "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "slide_image_width",
+          "label": "Ancho de imagen",
+          "options": [
+            { "value": "100%",   "label": "Full width (100%)" },
+            { "value": "1600px", "label": "1600 px" },
+            { "value": "1440px", "label": "1440 px" },
+            { "value": "1280px", "label": "1280 px" },
+            { "value": "1024px", "label": "1024 px" },
+            { "value": "800px",  "label": "800 px" }
+          ],
+          "default": "100%"
         },
         { "type": "header", "content": "Imagen móvil" },
         {
