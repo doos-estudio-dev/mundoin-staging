@@ -16,53 +16,43 @@
           "type": "desktop_slide",
           "name": "Desktop slide 1",
           "settings": {
-            "image": "shopify://shop_images/BANNER-MAYO_2_c0a713d6-a00d-4e23-ac7f-a01c29bf72c8.jpg",
+            "image": "shopify://shop_images/BANNERS-JUNIO-2026-1_76a4d907-0bf5-4449-9064-4e5c81c8480e.jpg",
             "alt_text": "Productos Exterior",
-            "link": "shopify://collections/comedores",
-            "slide_height": 0,
-            "slide_fit": "contain",
-            "slide_position": "center",
-            "slide_image_width": "100%"
+            "link": "shopify://pages/promociones-de-junio"
           }
         },
         "desktop_slide_agz47M": {
           "type": "desktop_slide",
           "name": "Desktop slide 2",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/BANNERS_SABAH.jpg",
             "alt_text": "BANNER 2",
-            "link": "shopify://collections/banner-2-promociones-mundo-in",
-            "slide_height": 0,
-            "slide_fit": "",
-            "slide_position": "center",
-            "slide_image_width": "100%"
+            "link": "shopify://collections/banner-2-promociones-mundo-in"
           }
         },
         "desktop_slide_Ljzwjh": {
           "type": "desktop_slide",
           "name": "Desktop slide 3",
           "settings": {
-            "image": "shopify://shop_images/BANNER3_1.jpg",
+            "image": "shopify://shop_images/BANNERS-JUNIO-2026_OFICINA_MP.jpg",
             "alt_text": "Banner desktop",
-            "link": "shopify://collections/banner-3-promociones-mundo-in",
-            "slide_height": 0,
-            "slide_fit": "",
-            "slide_position": "center",
-            "slide_image_width": "100%"
+            "link": "shopify://collections/oficina"
           }
         },
         "mobile_slide_8JpMzC": {
           "type": "mobile_slide",
           "name": "Mobile slide 1",
           "settings": {
-            "image_m": "shopify://shop_images/BANNER-MAYO_MOB_2_3a8b38ce-ef0f-43e9-a015-5a641a18d504.jpg",
+            "image_m": "shopify://shop_images/BANNERS-JUNIO-MP_MOB_9e4b54cd-50a1-4693-8988-3add4b93fc8c.jpg",
             "alt_text_m": "Banner mobile",
-            "link_m": "shopify://collections/comedores"
+            "link_m": "shopify://pages/promociones-de-junio"
           }
         },
         "mobile_slide_xR4EBx": {
           "type": "mobile_slide",
           "name": "Mobile slide 2",
+          "disabled": true,
           "settings": {
             "image_m": "shopify://shop_images/BANNERS_SABAH_MOB.jpg",
             "alt_text_m": "Banner mobile 2",
@@ -73,9 +63,9 @@
           "type": "mobile_slide",
           "name": "Mobile slide 3",
           "settings": {
-            "image_m": "shopify://shop_images/BANNER3_MOB.jpg",
+            "image_m": "shopify://shop_images/BANNERS-JUNIO-OFICINA_MOB_586295ea-57ee-4d90-aea8-fbd877777bef.jpg",
             "alt_text_m": "Banner mobile",
-            "link_m": "shopify://collections/banner-3-promociones-mundo-in"
+            "link_m": ""
           }
         },
         "multicolumn_TaB4rg": {
@@ -85,7 +75,7 @@
             "subheading": "",
             "col1_icon": "shopify://shop_images/Gratis.svg",
             "col1_title": "Envío gratis a todo México",
-            "col1_text": "<p>A partir de $3,500. Consulta cobertura de envío.</p>",
+            "col1_text": "<p>A partir de $3,500 MXN. Consulta cobertura de envío.</p>",
             "col2_icon": "shopify://shop_images/Armado.svg",
             "col2_title": "Armado Gratis",
             "col2_text": "<p>Hasta 3er piso incluido; nivel adicional $150.<br/>No incluye armado en envíos por paquetería.<br/></p>",
@@ -354,16 +344,7 @@
         "@media (max-width: 480px) {.collections-grid {grid-template-columns: 1fr 1fr; align-items: end; }}"
       ],
       "name": "Home",
-      "settings": {
-        "desktop_height": 550,
-        "desktop_fit": "cover",
-        "desktop_bg_color": "#f5f5f5",
-        "mobile_height": 400,
-        "mobile_fit": "contain",
-        "mobile_bg_color": "#ffffff",
-        "unified_carousel": false,
-        "faq_title": ""
-      }
+      "settings": {}
     },
     "klaviyo_form_GxgdLf": {
       "type": "klaviyo-form",
