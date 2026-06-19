@@ -15,6 +15,8 @@
         "slide_FETfxy": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/BANNERS-JUNIO-2026-1_76a4d907-0bf5-4449-9064-4e5c81c8480e.jpg",
+            "image_mobile": "shopify://shop_images/BANNERS-JUNIO-MP_MOB_9e4b54cd-50a1-4693-8988-3add4b93fc8c.jpg",
             "alt_text": "",
             "link": ""
           }
@@ -22,13 +24,8 @@
         "slide_bfnajB": {
           "type": "slide",
           "settings": {
-            "alt_text": "",
-            "link": ""
-          }
-        },
-        "slide_LK8tnq": {
-          "type": "slide",
-          "settings": {
+            "image": "shopify://shop_images/BANNERS-JUNIO-2026_OFICINA_e2c491f2-e583-4104-ba17-e6feaff0b257.jpg",
+            "image_mobile": "shopify://shop_images/BANNERS-JUNIO-OFICINA_MOB_586295ea-57ee-4d90-aea8-fbd877777bef.jpg",
             "alt_text": "",
             "link": ""
           }
@@ -36,16 +33,15 @@
       },
       "block_order": [
         "slide_FETfxy",
-        "slide_bfnajB",
-        "slide_LK8tnq"
+        "slide_bfnajB"
       ],
       "name": "Banner Slideshow",
       "settings": {
-        "desktop_height": 800,
-        "mobile_height": 450,
+        "desktop_height": 380,
+        "mobile_height": 600,
         "desktop_fit": "cover",
         "desktop_bg_color": "#f5f5f5",
-        "mobile_fit": "contain",
+        "mobile_fit": "cover",
         "mobile_bg_color": "#ffffff",
         "show_arrows": true,
         "show_dots": true,
