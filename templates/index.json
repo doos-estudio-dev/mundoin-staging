@@ -9,53 +9,12 @@
  */
 {
   "sections": {
-    "banner_slideshow_QkcAiT": {
-      "type": "banner-slideshow",
-      "blocks": {
-        "slide_FETfxy": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/BANNERS-JUNIO-2026-1_76a4d907-0bf5-4449-9064-4e5c81c8480e.jpg",
-            "image_mobile": "shopify://shop_images/BANNERS-JUNIO-MP_MOB_9e4b54cd-50a1-4693-8988-3add4b93fc8c.jpg",
-            "alt_text": "",
-            "link": ""
-          }
-        },
-        "slide_bfnajB": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/BANNERS-JUNIO-2026_OFICINA_e2c491f2-e583-4104-ba17-e6feaff0b257.jpg",
-            "image_mobile": "shopify://shop_images/BANNERS-JUNIO-OFICINA_MOB_586295ea-57ee-4d90-aea8-fbd877777bef.jpg",
-            "alt_text": "",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "slide_FETfxy",
-        "slide_bfnajB"
-      ],
-      "name": "Banner Slideshow",
-      "settings": {
-        "desktop_height": 380,
-        "mobile_height": 600,
-        "desktop_fit": "cover",
-        "desktop_bg_color": "#f5f5f5",
-        "mobile_fit": "cover",
-        "mobile_bg_color": "#ffffff",
-        "show_arrows": true,
-        "show_dots": true,
-        "autoplay": false,
-        "autoplay_speed": 5
-      }
-    },
     "home_K8bixT": {
       "type": "home",
       "blocks": {
         "desktop_slide_X8qm8M": {
           "type": "desktop_slide",
           "name": "Desktop slide 1",
-          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/BANNER-MAYO_2_c0a713d6-a00d-4e23-ac7f-a01c29bf72c8.jpg",
             "alt_text": "Productos Exterior",
@@ -69,7 +28,6 @@
         "desktop_slide_agz47M": {
           "type": "desktop_slide",
           "name": "Desktop slide 2",
-          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/BANNERS_SABAH.jpg",
             "alt_text": "BANNER 2",
@@ -83,7 +41,6 @@
         "desktop_slide_Ljzwjh": {
           "type": "desktop_slide",
           "name": "Desktop slide 3",
-          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/BANNER3_1.jpg",
             "alt_text": "Banner desktop",
@@ -97,7 +54,6 @@
         "mobile_slide_8JpMzC": {
           "type": "mobile_slide",
           "name": "Mobile slide 1",
-          "disabled": true,
           "settings": {
             "image_m": "shopify://shop_images/BANNER-MAYO_MOB_2_3a8b38ce-ef0f-43e9-a015-5a641a18d504.jpg",
             "alt_text_m": "Banner mobile",
@@ -107,7 +63,6 @@
         "mobile_slide_xR4EBx": {
           "type": "mobile_slide",
           "name": "Mobile slide 2",
-          "disabled": true,
           "settings": {
             "image_m": "shopify://shop_images/BANNERS_SABAH_MOB.jpg",
             "alt_text_m": "Banner mobile 2",
@@ -117,7 +72,6 @@
         "mobile_slide_UEL3gi": {
           "type": "mobile_slide",
           "name": "Mobile slide 3",
-          "disabled": true,
           "settings": {
             "image_m": "shopify://shop_images/BANNER3_MOB.jpg",
             "alt_text_m": "Banner mobile",
@@ -424,7 +378,6 @@
     }
   },
   "order": [
-    "banner_slideshow_QkcAiT",
     "home_K8bixT",
     "klaviyo_form_GxgdLf"
   ]
