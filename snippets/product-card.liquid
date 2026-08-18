@@ -108,7 +108,7 @@
         // If user clicked a Button, Link, Form, Swatch, or Swatch Input -> Do NOT navigate
         const isInteractive = target.closest('button') || 
                               target.closest('a') || 
-                              target.closest('.product-card-color-swatches') ||
+                              target.closest('.product-card-swatches, .product-card-swatches-wrapper') ||
                               target.closest('label') || // Swatch labels
                               target.closest('input');   // Swatch inputs
 
