@@ -1,64 +1,106 @@
-{% assign sid = 'bsw-' | append: section.id %}
+{%- liquid
+  assign sid = 'bsw-' | append: section.id
+  assign arrow_alpha = section.settings.arrow_opacity | divided_by: 100.0
+  assign arrow_base_color = section.settings.arrow_bg_color | default: '#ffffff'
+  assign arrow_bg = arrow_base_color | color_modify: 'alpha', arrow_alpha
+  assign arrow_bg_hover = arrow_base_color | color_modify: 'alpha', 1.0
+-%}
 
 <style>
-  /* ─── Container ───────────────────────────────────────────────── */
   #{{ sid }} {
+    --bsw-h: {{ section.settings.desktop_height }}px;
+    --bsw-radius: {{ section.settings.border_radius }}px;
+    --bsw-arrow-size: {{ section.settings.arrow_size }}px;
+    --bsw-arrow-bg: {{ arrow_bg }};
+    --bsw-arrow-bg-hover: {{ arrow_bg_hover }};
+    --bsw-arrow-color: {{ section.settings.arrow_color }};
+    --bsw-arrow-inset: {{ section.settings.arrow_inset }}px;
+    --bsw-dot-color: {{ section.settings.dot_color }};
+    --bsw-bg: {{ section.settings.desktop_bg_color }};
+    --bsw-fit: {{ section.settings.desktop_fit }};
     position: relative;
     width: 100%;
+    max-width: {% if section.settings.max_width > 0 %}{{ section.settings.max_width }}px{% else %}100%{% endif %};
+    margin: 0 auto;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  #{{ sid }} .bsw__viewport {
+    position: relative;
     overflow: hidden;
-    background-color: {{ section.settings.desktop_bg_color }};
+    background-color: var(--bsw-bg);
+    border-radius: var(--bsw-radius);
   }
 
-  /* ─── Track ──────────────────────────────────────────────────── */
   #{{ sid }} .bsw__track {
-    display: flex;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: transform;
+    {%- if section.settings.transition == 'fade' %}
+      display: grid;
+      grid-template-areas: 'slide';
+    {%- else %}
+      display: flex;
+    {%- endif %}
   }
 
-  /* ─── Slide ──────────────────────────────────────────────────── */
   #{{ sid }} .bsw__slide {
+    position: relative;
     flex: 0 0 100%;
     min-width: 0;
-    position: relative;
-    height: {{ section.settings.desktop_height }}px;
-    overflow: hidden;
-    background-color: {{ section.settings.desktop_bg_color }};
+    background-color: var(--bsw-bg);
+    {%- if section.settings.height_mode == 'fixed' %}
+      height: var(--bsw-h);
+    {%- endif %}
   }
 
-  #{{ sid }} .bsw__link {
+  {%- if section.settings.transition == 'fade' %}
+    #{{ sid }} .bsw__slide {
+      grid-area: slide;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity {{ section.settings.transition_speed }}ms ease;
+    }
+    #{{ sid }} .bsw__slide.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+  {%- else %}
+    #{{ sid }} .bsw__track {
+      transition: transform {{ section.settings.transition_speed }}ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+    }
+  {%- endif %}
+
+  #{{ sid }} .bsw__link,
+  #{{ sid }} .bsw__media {
     display: block;
     width: 100%;
     height: 100%;
     text-decoration: none;
   }
 
-  #{{ sid }} .bsw__slide picture {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
   #{{ sid }} .bsw__slide img {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: {{ section.settings.desktop_fit }};
-    object-position: center;
+    {%- if section.settings.height_mode == 'fixed' %}
+      height: 100%;
+      object-fit: var(--bsw-fit);
+      object-position: center;
+    {%- else %}
+      height: auto;
+    {%- endif %}
   }
 
-  /* ─── Placeholder (no image set) ─────────────────────────────── */
+  /* ─── Placeholder ────────────────────────────────────────────── */
   #{{ sid }} .bsw__placeholder {
     width: 100%;
-    height: 100%;
+    {%- if section.settings.height_mode == 'fixed' %}height: 100%;{% else %}aspect-ratio: 1920 / 600;{% endif %}
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #e8e8e8;
     gap: 12px;
+    background: #e8e8e8;
     color: #999;
-    font-size: 0.9rem;
     font-family: sans-serif;
   }
   #{{ sid }} .bsw__placeholder svg {
@@ -69,6 +111,8 @@
   #{{ sid }} .bsw__placeholder span {
     font-size: 0.8rem;
     color: #aaa;
+    text-align: center;
+    padding: 0 1rem;
   }
 
   /* ─── Arrows ─────────────────────────────────────────────────── */
@@ -76,35 +120,45 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 10;
-    background: rgba(255, 255, 255, 0.85);
-    border: none;
-    border-radius: 50%;
-    width: 52px;
-    height: 52px;
-    cursor: pointer;
+    z-index: 3;
+    width: var(--bsw-arrow-size);
+    height: var(--bsw-arrow-size);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
-    transition: background 0.2s ease, transform 0.2s ease;
     padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--bsw-arrow-bg);
+    color: var(--bsw-arrow-color);
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   }
   #{{ sid }} .bsw__arrow:hover {
-    background: #fff;
-    transform: translateY(-50%) scale(1.08);
+    background: var(--bsw-arrow-bg-hover);
+    transform: translateY(-50%) scale(1.06);
+  }
+  #{{ sid }} .bsw__arrow:focus-visible {
+    outline: 2px solid var(--bsw-arrow-color);
+    outline-offset: 3px;
+  }
+  #{{ sid }} .bsw__arrow[disabled] {
+    opacity: 0.35;
+    cursor: default;
+    transform: translateY(-50%);
   }
   #{{ sid }} .bsw__arrow svg {
-    width: 22px;
-    height: 22px;
+    width: 45%;
+    height: 45%;
     fill: none;
-    stroke: #222;
-    stroke-width: 2.2;
+    stroke: currentColor;
+    stroke-width: 2.4;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  #{{ sid }} .bsw__arrow--prev { left: 1.25rem; }
-  #{{ sid }} .bsw__arrow--next { right: 1.25rem; }
+  #{{ sid }} .bsw__arrow--prev { left: var(--bsw-arrow-inset); }
+  #{{ sid }} .bsw__arrow--next { right: var(--bsw-arrow-inset); }
 
   /* ─── Dots ───────────────────────────────────────────────────── */
   #{{ sid }} .bsw__dots {
@@ -114,255 +168,392 @@
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
-    z-index: 10;
+    z-index: 3;
   }
   #{{ sid }} .bsw__dot {
     width: 10px;
     height: 10px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.45);
-    border: 2px solid rgba(255, 255, 255, 0.85);
-    cursor: pointer;
     padding: 0;
-    transition: background 0.25s, transform 0.25s;
+    border-radius: 50%;
+    border: 2px solid var(--bsw-dot-color);
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.25s ease;
   }
   #{{ sid }} .bsw__dot.is-active {
-    background: #fff;
-    transform: scale(1.4);
+    background: var(--bsw-dot-color);
+    transform: scale(1.35);
   }
 
   /* ─── Mobile ─────────────────────────────────────────────────── */
-  @media (max-width: 768px) {
-    #{{ sid }} .bsw__slide {
-      height: {{ section.settings.mobile_height }}px;
-      background-color: {{ section.settings.mobile_bg_color }};
+  @media screen and (max-width: 749px) {
+    #{{ sid }} {
+      --bsw-h: {{ section.settings.mobile_height }}px;
+      --bsw-bg: {{ section.settings.mobile_bg_color }};
+      --bsw-fit: {{ section.settings.mobile_fit }};
+      --bsw-arrow-size: {{ section.settings.arrow_size | times: 0.75 | round }}px;
+      --bsw-arrow-inset: {{ section.settings.arrow_inset | divided_by: 2 }}px;
+      --bsw-radius: {{ section.settings.border_radius_mobile }}px;
+      padding-top: {{ section.settings.padding_top | divided_by: 2 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | divided_by: 2 }}px;
     }
-    #{{ sid }} .bsw__slide img {
-      object-fit: {{ section.settings.mobile_fit }};
-    }
-    #{{ sid }} .bsw__arrow {
-      width: 40px;
-      height: 40px;
-    }
-    #{{ sid }} .bsw__arrow svg {
-      width: 17px;
-      height: 17px;
-    }
-    #{{ sid }} .bsw__arrow--prev { left: 0.6rem; }
-    #{{ sid }} .bsw__arrow--next { right: 0.6rem; }
     #{{ sid }} .bsw__dots { bottom: 0.6rem; }
+    {%- unless section.settings.show_arrows_mobile %}
+      #{{ sid }} .bsw__arrow { display: none; }
+    {%- endunless %}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #{{ sid }} .bsw__track,
+    #{{ sid }} .bsw__slide { transition: none !important; }
   }
 </style>
 
-<section id="{{ sid }}" class="banner-slideshow" aria-label="Carrusel de imágenes">
+<section
+  id="{{ sid }}"
+  class="banner-slideshow"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+  data-loop="{{ section.settings.loop }}"
+  data-transition="{{ section.settings.transition }}"
+  aria-roledescription="carousel"
+  aria-label="{{ section.settings.aria_label | default: 'Banners promocionales' | escape }}"
+>
+  <div class="bsw__viewport">
+    <div class="bsw__track">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign loading_attr = 'lazy'
+          assign fetch_attr = 'auto'
+          if forloop.first
+            assign loading_attr = 'eager'
+            assign fetch_attr = 'high'
+          endif
 
-  <div class="bsw__track" aria-live="polite">
-    {% for block in section.blocks %}
-      {% assign loading_attr = 'lazy' %}
-      {% assign fetch_attr   = 'auto' %}
-      {% if forloop.first %}
-        {% assign loading_attr = 'eager' %}
-        {% assign fetch_attr   = 'high' %}
-      {% endif %}
-      {% assign alt_d = block.settings.alt_text | default: 'Slide' %}
-      {% assign slide_label = 'Slide ' | append: forloop.index | append: ' de ' | append: section.blocks.size %}
+          assign desktop_image = block.settings.image
+          assign mobile_image = block.settings.image_mobile
+          if desktop_image == blank
+            assign desktop_image = mobile_image
+          endif
+          if mobile_image == blank
+            assign mobile_image = desktop_image
+          endif
 
-      <div class="bsw__slide" {{ block.shopify_attributes }}
-           role="group" aria-label="{{ slide_label }}">
+          assign alt_text = block.settings.alt_text
+          if alt_text == blank
+            assign alt_text = desktop_image.alt
+          endif
+        -%}
 
-        {% if block.settings.link != blank %}
-          <a class="bsw__link" href="{{ block.settings.link }}">
-        {% endif %}
+        <div
+          class="bsw__slide{% if forloop.first %} is-active{% endif %}"
+          role="group"
+          aria-roledescription="slide"
+          aria-label="{{ forloop.index }} / {{ section.blocks.size }}"
+          {% unless forloop.first %}aria-hidden="true"{% endunless %}
+          {{ block.shopify_attributes }}
+        >
+          {%- capture slide_media -%}
+            {%- if desktop_image != blank -%}
+              <picture class="bsw__media">
+                {%- if block.settings.image_mobile != blank and block.settings.image != blank -%}
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="
+                      {{ mobile_image | image_url: width: 375 }} 375w,
+                      {{ mobile_image | image_url: width: 550 }} 550w,
+                      {{ mobile_image | image_url: width: 750 }} 750w,
+                      {{ mobile_image | image_url: width: 1100 }} 1100w
+                    "
+                    sizes="100vw"
+                    width="{{ mobile_image.width }}"
+                    height="{{ mobile_image.height }}"
+                  >
+                {%- endif -%}
+                {{
+                  desktop_image
+                  | image_url: width: 2400
+                  | image_tag:
+                    alt: alt_text,
+                    loading: loading_attr,
+                    fetchpriority: fetch_attr,
+                    decoding: 'async',
+                    widths: '750, 1100, 1500, 1780, 2000, 2400',
+                    sizes: '100vw'
+                }}
+              </picture>
+            {%- else -%}
+              <div class="bsw__placeholder">
+                {{ 'image' | placeholder_svg_tag }}
+                <span>
+                  Desktop: 1920 × {{ section.settings.desktop_height }} px &nbsp;|&nbsp;
+                  Móvil: 750 × {{ section.settings.mobile_height }} px
+                </span>
+              </div>
+            {%- endif -%}
+          {%- endcapture -%}
 
-        {% if block.settings.image != blank %}
-          {% if block.settings.image_mobile != blank %}
-            {% capture mob_srcset %}{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 550 }} 550w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 828 }} 828w{% endcapture %}
-            <picture>
-              <source media="(max-width: 768px)" srcset="{{ mob_srcset }}" sizes="100vw">
-              {{
-                block.settings.image
-                | image_url: width: 2400
-                | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr,
-                  decoding: 'async', widths: '750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw'
-              }}
-            </picture>
-          {% else %}
-            {{
-              block.settings.image
-              | image_url: width: 2400
-              | image_tag: alt: alt_d, loading: loading_attr, fetchpriority: fetch_attr,
-                decoding: 'async', widths: '375, 750, 1100, 1500, 1780, 2000, 2400', sizes: '100vw'
-            }}
-          {% endif %}
-        {% else %}
-          <div class="bsw__placeholder">
-            {{ 'image' | placeholder_svg_tag }}
-            <span>Desktop: 1920 × {{ section.settings.desktop_height }} px &nbsp;|&nbsp; Móvil: 750 × {{ section.settings.mobile_height }} px</span>
-          </div>
-        {% endif %}
+          {%- if block.settings.link != blank -%}
+            <a
+              class="bsw__link"
+              href="{{ block.settings.link }}"
+              {% unless forloop.first %}tabindex="-1"{% endunless %}
+            >
+              {{ slide_media }}
+            </a>
+          {%- else -%}
+            {{ slide_media }}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
 
-        {% if block.settings.link != blank %}
-          </a>
-        {% endif %}
+    {%- if section.blocks.size > 1 -%}
+      {%- if section.settings.show_arrows -%}
+        <button class="bsw__arrow bsw__arrow--prev" type="button" aria-label="Banner anterior">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <button class="bsw__arrow bsw__arrow--next" type="button" aria-label="Banner siguiente">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      {%- endif -%}
 
-      </div>
-    {% endfor %}
+      {%- if section.settings.show_dots -%}
+        <div class="bsw__dots" role="group" aria-label="Seleccionar banner">
+          {%- for block in section.blocks -%}
+            <button
+              class="bsw__dot{% if forloop.first %} is-active{% endif %}"
+              type="button"
+              aria-label="Ir al banner {{ forloop.index }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
   </div>
-
-  {% if section.blocks.size > 1 %}
-    {% if section.settings.show_arrows %}
-      <button class="bsw__arrow bsw__arrow--prev" type="button" aria-label="Slide anterior">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="bsw__arrow bsw__arrow--next" type="button" aria-label="Slide siguiente">
-        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    {% endif %}
-
-    {% if section.settings.show_dots %}
-      <div class="bsw__dots" role="tablist" aria-label="Navegación de slides">
-        {% for block in section.blocks %}
-          <button class="bsw__dot{% if forloop.first %} is-active{% endif %}"
-            type="button" role="tab"
-            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-            aria-label="Ir a slide {{ forloop.index }}">
-          </button>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endif %}
-
 </section>
 
 <script>
-(function () {
-  var root  = document.getElementById('{{ sid }}');
-  if (!root) return;
+  (function () {
+    var root = document.getElementById('{{ sid }}');
+    if (!root || root.dataset.bswInit === 'true') return;
+    root.dataset.bswInit = 'true';
 
-  var track  = root.querySelector('.bsw__track');
-  var slides = track.querySelectorAll('.bsw__slide');
-  var total  = slides.length;
-  if (total <= 1) return;
+    var track = root.querySelector('.bsw__track');
+    var slides = Array.prototype.slice.call(root.querySelectorAll('.bsw__slide'));
+    var total = slides.length;
+    if (total <= 1) return;
 
-  var prevBtn = root.querySelector('.bsw__arrow--prev');
-  var nextBtn = root.querySelector('.bsw__arrow--next');
-  var dots    = Array.prototype.slice.call(root.querySelectorAll('.bsw__dot'));
+    var prevBtn = root.querySelector('.bsw__arrow--prev');
+    var nextBtn = root.querySelector('.bsw__arrow--next');
+    var dots = Array.prototype.slice.call(root.querySelectorAll('.bsw__dot'));
 
-  var current   = 0;
-  var autoTimer = null;
+    var isFade = root.dataset.transition === 'fade';
+    var loop = root.dataset.loop === 'true';
+    var autoplay = root.dataset.autoplay === 'true';
+    var speed = parseInt(root.dataset.autoplaySpeed, 10) || 5000;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function goTo(idx) {
-    current = ((idx % total) + total) % total;
-    track.style.transform = 'translateX(-' + (current * 100) + '%)';
-    dots.forEach(function (d, i) {
-      d.classList.toggle('is-active', i === current);
-      d.setAttribute('aria-selected', String(i === current));
+    var current = 0;
+    var timer = null;
+
+    function render() {
+      if (isFade) {
+        slides.forEach(function (slide, i) {
+          slide.classList.toggle('is-active', i === current);
+        });
+      } else {
+        track.style.transform = 'translateX(-' + current * 100 + '%)';
+      }
+
+      slides.forEach(function (slide, i) {
+        var active = i === current;
+        slide.setAttribute('aria-hidden', String(!active));
+        var link = slide.querySelector('.bsw__link');
+        if (link) link.tabIndex = active ? 0 : -1;
+      });
+
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('is-active', i === current);
+        dot.setAttribute('aria-current', String(i === current));
+      });
+
+      if (!loop) {
+        if (prevBtn) prevBtn.disabled = current === 0;
+        if (nextBtn) nextBtn.disabled = current === total - 1;
+      }
+    }
+
+    function goTo(index) {
+      if (loop) {
+        current = ((index % total) + total) % total;
+      } else {
+        current = Math.max(0, Math.min(total - 1, index));
+      }
+      render();
+    }
+
+    function stopAuto() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function startAuto() {
+      if (!autoplay || reduceMotion) return;
+      stopAuto();
+      timer = setInterval(function () {
+        goTo(current + 1);
+      }, speed);
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () { goTo(i); });
     });
-  }
 
-  if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
-  if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
-  dots.forEach(function (d, i) { d.addEventListener('click', function () { goTo(i); }); });
+    root.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowLeft') { goTo(current - 1); }
+      else if (event.key === 'ArrowRight') { goTo(current + 1); }
+    });
 
-  {% if section.settings.autoplay %}
-  var delay = {{ section.settings.autoplay_speed | times: 1000 }};
-  function startAuto() { autoTimer = setInterval(function () { goTo(current + 1); }, delay); }
-  function stopAuto()  { clearInterval(autoTimer); }
-  startAuto();
-  root.addEventListener('mouseenter', stopAuto);
-  root.addEventListener('mouseleave', startAuto);
-  root.addEventListener('focusin',    stopAuto);
-  root.addEventListener('focusout',   startAuto);
-  {% endif %}
+    /* ── Swipe ── */
+    var startX = 0;
+    var startY = 0;
+    var swiping = false;
 
-  /* ── Swipe ── */
-  var touchX = 0;
-  track.addEventListener('touchstart', function (e) {
-    touchX = e.touches[0].clientX;
-  }, { passive: true });
-  track.addEventListener('touchend', function (e) {
-    var diff = touchX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
-  }, { passive: true });
-})();
+    track.addEventListener('touchstart', function (event) {
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+      swiping = true;
+    }, { passive: true });
+
+    track.addEventListener('touchend', function (event) {
+      if (!swiping) return;
+      swiping = false;
+      var deltaX = startX - event.changedTouches[0].clientX;
+      var deltaY = startY - event.changedTouches[0].clientY;
+      if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        goTo(current + (deltaX > 0 ? 1 : -1));
+      }
+    }, { passive: true });
+
+    /* ── Autoplay ── */
+    if (autoplay && !reduceMotion) {
+      startAuto();
+      root.addEventListener('mouseenter', stopAuto);
+      root.addEventListener('mouseleave', startAuto);
+      root.addEventListener('focusin', stopAuto);
+      root.addEventListener('focusout', startAuto);
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { stopAuto(); } else { startAuto(); }
+      });
+    }
+
+    /* ── Theme editor ── */
+    document.addEventListener('shopify:block:select', function (event) {
+      if (!root.contains(event.target)) return;
+      var index = slides.indexOf(event.target);
+      if (index > -1) {
+        stopAuto();
+        goTo(index);
+      }
+    });
+    document.addEventListener('shopify:block:deselect', function (event) {
+      if (root.contains(event.target)) startAuto();
+    });
+
+    render();
+  })();
 </script>
 
 {% schema %}
 {
   "name": "Banner Slideshow",
   "tag": "section",
+  "max_blocks": 12,
   "settings": [
     {
       "type": "header",
       "content": "Altura del banner"
     },
     {
+      "type": "select",
+      "id": "height_mode",
+      "label": "Modo de altura",
+      "options": [
+        { "value": "fixed", "label": "Altura fija (px)" },
+        { "value": "auto", "label": "Automática — según la proporción de la imagen" }
+      ],
+      "default": "fixed",
+      "info": "Con altura automática la imagen nunca se recorta, pero el alto depende de cada imagen."
+    },
+    {
       "type": "range",
       "id": "desktop_height",
       "label": "Altura desktop (px)",
-      "min": 200,
+      "min": 150,
       "max": 900,
       "step": 10,
-      "default": 600,
+      "default": 450,
       "info": "Dimensión recomendada de imagen: 1920 × [esta altura] px"
     },
     {
       "type": "range",
       "id": "mobile_height",
       "label": "Altura móvil (px)",
-      "min": 150,
+      "min": 120,
       "max": 800,
       "step": 10,
-      "default": 450,
+      "default": 380,
       "info": "Dimensión recomendada de imagen: 750 × [esta altura] px"
     },
     {
       "type": "header",
-      "content": "Ajuste de imagen desktop"
+      "content": "Ajuste de imagen"
     },
     {
       "type": "select",
       "id": "desktop_fit",
-      "label": "Modo de ajuste",
+      "label": "Ajuste en desktop",
       "options": [
-        { "value": "cover",   "label": "Rellenar — imagen puede recortarse" },
+        { "value": "cover", "label": "Rellenar — la imagen puede recortarse" },
         { "value": "contain", "label": "Contener — imagen completa, sin recorte" }
       ],
-      "default": "cover",
-      "info": "Con 'Contener', la imagen debe medir exactamente 1920 × [altura] px para no mostrar franjas"
+      "default": "cover"
     },
     {
       "type": "color",
       "id": "desktop_bg_color",
       "label": "Color de fondo desktop",
-      "default": "#f5f5f5",
-      "info": "Visible con 'Contener' si la imagen no llena todo el espacio"
-    },
-    {
-      "type": "header",
-      "content": "Ajuste de imagen móvil"
+      "default": "#f5f5f5"
     },
     {
       "type": "select",
       "id": "mobile_fit",
-      "label": "Modo de ajuste",
+      "label": "Ajuste en móvil",
       "options": [
-        { "value": "contain", "label": "Contener — imagen completa, sin recorte" },
-        { "value": "cover",   "label": "Rellenar — imagen puede recortarse" }
+        { "value": "cover", "label": "Rellenar — la imagen puede recortarse" },
+        { "value": "contain", "label": "Contener — imagen completa, sin recorte" }
       ],
-      "default": "contain",
-      "info": "Con 'Contener', la imagen debe medir exactamente 750 × [altura móvil] px para no mostrar franjas"
+      "default": "cover"
     },
     {
       "type": "color",
       "id": "mobile_bg_color",
       "label": "Color de fondo móvil",
-      "default": "#ffffff",
-      "info": "Visible con 'Contener' si la imagen no llena todo el espacio"
+      "default": "#ffffff"
     },
     {
       "type": "header",
-      "content": "Controles de navegación"
+      "content": "Flechas"
     },
     {
       "type": "checkbox",
@@ -372,13 +563,94 @@
     },
     {
       "type": "checkbox",
+      "id": "show_arrows_mobile",
+      "label": "Mostrar flechas en móvil",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "label": "Tamaño de la flecha (px)",
+      "min": 28,
+      "max": 72,
+      "step": 2,
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "arrow_inset",
+      "label": "Separación del borde (px)",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_color",
+      "label": "Color de fondo de la flecha",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "arrow_opacity",
+      "label": "Opacidad del fondo (%)",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "default": 70
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Color del ícono",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Puntos indicadores"
+    },
+    {
+      "type": "checkbox",
       "id": "show_dots",
       "label": "Mostrar puntos indicadores",
       "default": true
     },
     {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Color de los puntos",
+      "default": "#ffffff"
+    },
+    {
       "type": "header",
-      "content": "Autoplay"
+      "content": "Movimiento"
+    },
+    {
+      "type": "select",
+      "id": "transition",
+      "label": "Tipo de transición",
+      "options": [
+        { "value": "slide", "label": "Deslizar" },
+        { "value": "fade", "label": "Desvanecer" }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "label": "Duración de la transición (ms)",
+      "min": 100,
+      "max": 1200,
+      "step": 50,
+      "default": 500
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Repetir en bucle",
+      "default": true,
+      "info": "Si se desactiva, las flechas se deshabilitan en el primer y último banner."
     },
     {
       "type": "checkbox",
@@ -389,30 +661,85 @@
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "Velocidad (segundos por slide)",
+      "label": "Velocidad (segundos por banner)",
       "min": 2,
       "max": 12,
       "step": 1,
-      "default": 5,
-      "info": "Solo aplica si la reproducción automática está activada"
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Diseño de la sección"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo (px)",
+      "min": 0,
+      "max": 1920,
+      "step": 20,
+      "default": 0,
+      "info": "0 = ancho completo de la pantalla."
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Esquinas redondeadas desktop (px)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_radius_mobile",
+      "label": "Esquinas redondeadas móvil (px)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacio superior (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacio inferior (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Nombre del carrusel (accesibilidad)",
+      "default": "Banners promocionales"
     }
   ],
   "blocks": [
     {
       "type": "slide",
-      "name": "Slide",
+      "name": "Banner",
       "settings": [
         {
           "type": "image_picker",
           "id": "image",
           "label": "Imagen desktop",
-          "info": "Rec. con Rellenar: 1920 × 600 px (o ajusta al alto configurado) — Rec. con Contener: exactamente 1920 × [altura] px"
+          "info": "Recomendado: 1920 × [altura desktop] px"
         },
         {
           "type": "image_picker",
           "id": "image_mobile",
-          "label": "Imagen móvil (opcional)",
-          "info": "Rec. con Rellenar: 750 × 450 px — Rec. con Contener: exactamente 750 × [altura móvil] px — si no se sube, se usa la imagen desktop"
+          "label": "Imagen móvil",
+          "info": "Recomendado: 750 × [altura móvil] px. Si se deja vacía se usa la imagen desktop."
         },
         {
           "type": "text",
