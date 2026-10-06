@@ -216,7 +216,7 @@
         "circular_collection_item_3DKtVi": {
           "type": "circular_collection_item",
           "settings": {
-            "collection": "bancos",
+            "collection": "bancos-para-barra-de-cocina",
             "image": "shopify://shop_images/BANCOS.webp",
             "title": "Bancos de cocina",
             "subtitle": "",
