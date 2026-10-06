@@ -163,13 +163,7 @@
               {% if use_hardcoded_filters %}
                 {%- comment -%} Usar filtros hardcodeados basados en metacampos {%- endcomment -%}
                 {% capture rendered_filters %}
-                  {% render 'hardcoded-filters',
-                    collection: results,
-                    filter_style: block_settings.filter_style,
-                    sectionId: section.id,
-                    in_drawer: false,
-                    should_render_clear: block_settings.filter_style != 'vertical'
-                  %}
+                  {% render 'hardcoded-filters', collection: results, filter_style: block_settings.filter_style, sectionId: section.id, in_drawer: false, should_render_clear: block_settings.filter_style %}
                 {% endcapture %}
               {% else %}
                 {%- comment -%} Usar filtros de Search & Discovery (por defecto) {%- endcomment -%}
@@ -1277,3 +1271,22 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'hardcoded-filters',
+                        collection: results,
+                        filter_style: block_settings.filter_style,
+                        sectionId: section.id,
+                        in_drawer: false,
+                        should_render_clear: block_settings.filter_style != 'vertical'
+                      %}
+  to: "{% render 'hardcoded-filters', collection: results, filter_style: block_settings.filter_style,
+    sectionId: section.id, in_drawer: false, should_render_clear: block_settings.filter_style
+    %}"
+  position: 5972..6159
+{% endcomment %}
