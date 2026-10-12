@@ -196,7 +196,7 @@
         "circular_collection_item_dUJdqb": {
           "type": "circular_collection_item",
           "settings": {
-            "collection": "archiveros",
+            "collection": "archiveros-para-oficina",
             "image": "shopify://shop_images/ARCHIVEROS.webp",
             "title": "Archiveros",
             "subtitle": "",
